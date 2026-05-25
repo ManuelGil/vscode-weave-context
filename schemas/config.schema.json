@@ -1,0 +1,25 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"properties": {
+		"weaveContext.enable": {
+			"type": "boolean",
+			"default": true,
+			"scope": "resource",
+			"description": "Enable or disable the extension."
+		},
+		"weaveContext.notesRoot": {
+			"type": "string",
+			"default": ".context/notes",
+			"scope": "resource",
+			"description": "Relative or absolute path used as the canonical notes root for discovery, indexing, and navigation."
+		},
+		"weaveContext.treeProjection": {
+			"type": "string",
+			"enum": ["filesystem", "category", "status", "tags", "project"],
+			"default": "filesystem",
+			"scope": "resource",
+			"description": "Single active grouping mode for the notes explorer."
+		}
+	}
+}

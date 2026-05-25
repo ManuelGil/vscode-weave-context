@@ -1,0 +1,19 @@
+{
+	"weaveContext.enable.description": "Enable or disable the extension",
+	"weaveContext.notesRoot.description": "Relative or absolute path used as the canonical notes root for discovery, indexing, and navigation.",
+	"weaveContext.treeProjection.description": "Single active grouping mode for the notes explorer.",
+	"weaveContext.changeWorkspace.title": "Change workspace folder",
+	"weaveContext.treeView.title": "WeaveContext",
+	"weaveContext.notesExplorer.title": "Note Map",
+	"weaveContext.createProjectNote.title": "Create project note",
+	"weaveContext.openProjectNote.title": "Open project note",
+	"weaveContext.insertNoteLink.title": "Insert note link",
+	"weaveContext.switchTreeProjection.title": "Switch tree projection",
+	"weaveContext.notesExplorer.refreshList.title": "Refresh notes list",
+	"weaveContext.feedback.aboutUs": "About",
+	"weaveContext.feedback.reportIssues": "Report Issues",
+	"weaveContext.feedback.rateUs": "Rate Extension",
+	"weaveContext.feedback.supportUs": "Support",
+	"weaveContext.feedbackView": "Feedback",
+	"viewsWelcome.weaveContext.notesExplorer": "Markdown files inside your configured notes root are listed here."
+}

@@ -1,0 +1,255 @@
+{
+	"name": "vscode-weave-context",
+	"displayName": "WeaveContext",
+	"description": "Navigate markdown workspaces with wikilinks, Note Map projections, native editor workflows, and local visual graph exploration.",
+	"version": "1.0.0",
+	"preview": true,
+	"icon": "icon.png",
+	"license": "MIT",
+	"publisher": "imgildev",
+	"author": {
+		"name": "Manuel Gil",
+		"email": "support@imgil.dev",
+		"url": "https://imgil.dev/"
+	},
+	"sponsor": {
+		"url": "https://github.com/sponsors/ManuelGil"
+	},
+	"packageManager": "pnpm@10.0.0",
+	"engines": {
+		"vscode": "^1.102.0",
+		"node": ">=22.15.1"
+	},
+	"categories": [
+		"Visualization",
+		"Other"
+	],
+	"keywords": [
+		"markdown",
+		"wikilinks",
+		"notes",
+		"navigation",
+		"rename",
+		"markdown-links",
+		"developer-productivity",
+		"vscode",
+		"note-map",
+		"workspace-navigation",
+		"markdown-workspace",
+		"visual-graph",
+		"graph-exploration",
+		"workspace-map"
+	],
+	"homepage": "https://github.com/ManuelGil/vscode-weave-context",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ManuelGil/vscode-weave-context.git"
+	},
+	"bugs": {
+		"url": "https://github.com/ManuelGil/vscode-weave-context/issues"
+	},
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"main": "./out/extension.js",
+	"l10n": "./l10n",
+	"files": [
+		"out",
+		"dist",
+		"assets/icon.svg",
+		"package*.json",
+		"README.md",
+		"LICENSE",
+		"icon.png",
+		"schemas",
+		"l10n"
+	],
+	"contributes": {
+		"configuration": {
+			"type": "object",
+			"title": "WeaveContext Configuration",
+			"properties": {
+				"weaveContext.enable": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "%weaveContext.enable.description%"
+				},
+				"weaveContext.notesRoot": {
+					"type": "string",
+					"default": ".context/notes",
+					"scope": "resource",
+					"description": "%weaveContext.notesRoot.description%"
+				},
+				"weaveContext.treeProjection": {
+					"type": "string",
+					"enum": [
+						"filesystem",
+						"category",
+						"status",
+						"tags",
+						"project"
+					],
+					"default": "filesystem",
+					"scope": "resource",
+					"description": "%weaveContext.treeProjection.description%"
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "weaveContext.changeWorkspace",
+				"title": "%weaveContext.changeWorkspace.title%",
+				"category": "WeaveContext"
+			},
+			{
+				"command": "weaveContext.createProjectNote",
+				"title": "%weaveContext.createProjectNote.title%",
+				"category": "WeaveContext"
+			},
+			{
+				"command": "weaveContext.openProjectNote",
+				"title": "%weaveContext.openProjectNote.title%",
+				"category": "WeaveContext"
+			},
+			{
+				"command": "weaveContext.insertNoteLink",
+				"title": "%weaveContext.insertNoteLink.title%",
+				"category": "WeaveContext"
+			},
+			{
+				"command": "weaveContext.switchTreeProjection",
+				"title": "%weaveContext.switchTreeProjection.title%",
+				"category": "WeaveContext",
+				"icon": "$(list-tree)"
+			},
+			{
+				"command": "weaveContext.notesExplorer.refreshList",
+				"title": "%weaveContext.notesExplorer.refreshList.title%",
+				"category": "WeaveContext",
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "weaveContext.feedback.aboutUs",
+				"title": "%weaveContext.feedback.aboutUs%",
+				"category": "WeaveContext",
+				"icon": "$(info)"
+			},
+			{
+				"command": "weaveContext.feedback.reportIssues",
+				"title": "%weaveContext.feedback.reportIssues%",
+				"category": "WeaveContext",
+				"icon": "$(bug)"
+			},
+			{
+				"command": "weaveContext.feedback.rateUs",
+				"title": "%weaveContext.feedback.rateUs%",
+				"category": "WeaveContext",
+				"icon": "$(star)"
+			},
+			{
+				"command": "weaveContext.feedback.supportUs",
+				"title": "%weaveContext.feedback.supportUs%",
+				"category": "WeaveContext",
+				"icon": "$(heart)"
+			}
+		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "weaveContext.switchTreeProjection",
+					"when": "view == weaveContext.notesExplorer",
+					"group": "navigation@1"
+				},
+				{
+					"command": "weaveContext.notesExplorer.refreshList",
+					"when": "view == weaveContext.notesExplorer",
+					"group": "navigation@2"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "weaveContext.notesExplorer",
+				"contents": "%viewsWelcome.weaveContext.notesExplorer%"
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "ContextExplorer",
+					"title": "%weaveContext.treeView.title%",
+					"icon": "./assets/icon.svg"
+				}
+			]
+		},
+		"views": {
+			"ContextExplorer": [
+				{
+					"id": "weaveContext.notesExplorer",
+					"name": "%weaveContext.notesExplorer.title%",
+					"visibility": "visible",
+					"icon": "$(folder)"
+				},
+				{
+					"id": "weaveContext.feedbackView",
+					"name": "%weaveContext.feedbackView%",
+					"visibility": "visible",
+					"icon": "$(comment-discussion)"
+				}
+			]
+		},
+		"jsonValidation": [
+			{
+				"fileMatch": ".vscode/settings.json",
+				"url": "./schemas/config.schema.json"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "pnpm compile",
+		"compile": "rimraf out && esbuild src/extension.ts --bundle --platform=node --target=node22 --format=cjs --external:vscode --outfile=out/extension.js --minify",
+		"watch": "tsc -watch -p ./",
+		"pretest": "pnpm compile && pnpm lint",
+		"format": "biome format --write .",
+		"lint": "biome lint .",
+		"lint:fix": "biome lint --write .",
+		"check": "biome check .",
+		"check:fix": "biome check --write --unsafe .",
+		"test": "vscode-test --config .vscode-test.mjs",
+		"l10n:check": "node scripts/check-l10n.js",
+		"nls:check": "node scripts/check-nls.js",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.14",
+		"@commitlint/cli": "^19.8.1",
+		"@commitlint/config-conventional": "^19.8.1",
+		"@types/mocha": "^10.0.10",
+		"@types/mustache": "^4.2.6",
+		"@types/node": "^22.19.17",
+		"@types/vscode": "^1.102.0",
+		"@vscode/l10n-dev": "^0.0.35",
+		"@vscode/test-cli": "^0.0.12",
+		"@vscode/test-electron": "^2.5.2",
+		"esbuild": "^0.28.0",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.4.0",
+		"mocha": "^11.7.5",
+		"rimraf": "^6.1.3",
+		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"@supercharge/promise-pool": "^3.3.0",
+		"fast-glob": "^3.3.3",
+		"ignore": "^7.0.5",
+		"mustache": "^4.2.0",
+		"vscode-marketplace-client": "^1.2.2"
+	},
+	"pnpm": {
+		"overrides": {},
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
+	}
+}

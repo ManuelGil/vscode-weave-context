@@ -1,0 +1,94 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.14/schema.json",
+	"vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
+	"files": {
+		"includes": ["**/src/**/*.ts"],
+		"ignoreUnknown": false
+	},
+	"formatter": {
+		"enabled": true,
+		"useEditorconfig": true,
+		"formatWithErrors": false,
+		"indentStyle": "space",
+		"indentWidth": 2,
+		"lineEnding": "lf",
+		"lineWidth": 80,
+		"attributePosition": "auto",
+		"bracketSpacing": true,
+		"includes": [
+			"**",
+			"!.vscode",
+			"!compodoc",
+			"!coverage",
+			"!docs",
+			"!node_modules",
+			"!out",
+			"!tests",
+			"!**/commitlint.config.js"
+		]
+	},
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": false,
+			"style": {
+				"useBlockStatements": "warn",
+				"useNamingConvention": {
+					"level": "warn",
+					"options": { "strictCase": false }
+				},
+				"useThrowOnlyError": "warn"
+			},
+			"suspicious": { "noDoubleEquals": "warn" }
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"jsxQuoteStyle": "double",
+			"quoteProperties": "preserve",
+			"trailingCommas": "all",
+			"semicolons": "always",
+			"arrowParentheses": "always",
+			"bracketSameLine": false,
+			"quoteStyle": "single",
+			"attributePosition": "auto",
+			"bracketSpacing": true
+		},
+		"globals": ["exports"]
+	},
+	"overrides": [
+		{
+			"includes": [
+				"**/*.ts",
+				"!**/out",
+				"!**/*.d.ts",
+				"!**/.vscode/",
+				"!**/compodoc/",
+				"!**/coverage/",
+				"!**/docs/",
+				"!**/node_modules/",
+				"!**/out/",
+				"!**/tests/",
+				"!**/commitlint.config.js",
+				"!**/eslint.config.mjs"
+			]
+		},
+		{
+			"includes": [
+				"**/*.ts",
+				"!**/out",
+				"!**/*.d.ts",
+				"!**/.vscode/",
+				"!**/compodoc/",
+				"!**/coverage/",
+				"!**/docs/",
+				"!**/node_modules/",
+				"!**/out/",
+				"!**/tests/",
+				"!**/commitlint.config.js",
+				"!**/eslint.config.mjs"
+			]
+		}
+	]
+}
