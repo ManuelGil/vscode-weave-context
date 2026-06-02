@@ -20,6 +20,8 @@ const FRONTMATTER_DELIMITER = '---';
  */
 const STRING_ARRAY_FIELDS = new Set(['tags', 'aliases']);
 
+const FRONTMATTER_CLOSING_SEQUENCE = `\n${FRONTMATTER_DELIMITER}\n`;
+
 /**
  * Formats a YAML scalar.
  *
@@ -106,6 +108,62 @@ export const collectBlockLines = (
     blockLines,
     nextIndex: currentIndex,
   };
+};
+
+export const upsertAliasesFrontmatterText = (
+  rawFrontmatterText: string,
+  aliases: string[],
+): string => {
+  const normalized = normalizeLineEndings(rawFrontmatterText).split('\n');
+  const aliasLines = buildAliasBlockLines(aliases);
+  const aliasStartIndex = normalized.findIndex((line) => {
+    if (!isTopLevelFieldLine(line)) {
+      return false;
+    }
+
+    const trimmed = line.trim();
+    const delimiterIndex = trimmed.indexOf(':');
+
+    if (delimiterIndex === -1) {
+      return false;
+    }
+
+    const fieldName = trimmed.slice(0, delimiterIndex).trim();
+    return fieldName === 'aliases';
+  });
+
+  if (aliasStartIndex === -1) {
+    const needsBlankLine =
+      normalized.length > 0 &&
+      normalized[normalized.length - 1].trim().length > 0;
+    const targetLines = needsBlankLine
+      ? [...normalized, '', ...aliasLines]
+      : [...normalized, ...aliasLines];
+    return targetLines.join('\n').trimEnd();
+  }
+
+  const { nextIndex: aliasEndIndex } = collectBlockLines(
+    normalized,
+    aliasStartIndex + 1,
+  );
+  const before = normalized.slice(0, aliasStartIndex);
+  const after = normalized.slice(aliasEndIndex);
+  return [...before, ...aliasLines, ...after].join('\n').trimEnd();
+};
+
+const buildAliasBlockLines = (aliases: string[]): string[] => {
+  const block = ['aliases:'];
+
+  if (aliases.length === 0) {
+    block.push('  -');
+    return block;
+  }
+
+  for (const alias of aliases) {
+    block.push(`  - ${formatYamlScalar(alias)}`);
+  }
+
+  return block;
 };
 
 /**
@@ -232,16 +290,19 @@ export const extractRawFrontmatter = (
     return null;
   }
 
-  const endDelimiterIndex = normalized.indexOf(
-    `\n${FRONTMATTER_DELIMITER}\n`,
-    4,
+  const closingDelimiterIndex = normalized.indexOf(
+    FRONTMATTER_CLOSING_SEQUENCE,
+    FRONTMATTER_DELIMITER.length + 1,
   );
 
-  if (endDelimiterIndex === -1) {
+  if (closingDelimiterIndex === -1) {
     return null;
   }
 
-  const frontmatterText = normalized.slice(4, endDelimiterIndex);
+  const frontmatterText = normalized.slice(
+    FRONTMATTER_DELIMITER.length + 1,
+    closingDelimiterIndex,
+  );
 
   return {
     text: frontmatterText,

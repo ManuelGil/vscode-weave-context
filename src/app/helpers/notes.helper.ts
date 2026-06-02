@@ -48,12 +48,6 @@ export const resolveProjectionKeys = (
     return [category || fallbackLabel];
   }
 
-  if (projection === 'status') {
-    const status = normalizeString(note.status);
-
-    return [status || fallbackLabel];
-  }
-
   if (projection === 'project') {
     const project = normalizeString(note.project);
 

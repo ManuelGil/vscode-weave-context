@@ -11,15 +11,9 @@
  * Determines how notes are grouped in the tree view:
  * - 'filesystem': Group by file system structure
  * - 'category': Group by note category field
- * - 'status': Group by note status field
  * - 'tags': Group by note tags
  */
-export type TreeProjectionMode =
-  | 'filesystem'
-  | 'category'
-  | 'status'
-  | 'tags'
-  | 'project';
+export type TreeProjectionMode = 'filesystem' | 'category' | 'tags' | 'project';
 
 /**
  * Minimal shape required for tree projection operations.
@@ -62,7 +56,6 @@ export type ProjectionFallbackLabels = Record<TreeProjectionMode, string>;
  */
 export const DEFAULT_PROJECTION_FALLBACKS: ProjectionFallbackLabels = {
   category: 'General Context',
-  status: 'Unspecified',
   tags: 'Untagged',
   project: 'Unassigned Project',
   filesystem: 'Root',

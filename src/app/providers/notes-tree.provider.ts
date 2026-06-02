@@ -102,7 +102,6 @@ export class NotesTreeProvider implements TreeDataProvider<NotesTreeNode> {
     const baseOptions: Array<QuickPickItem & { value: TreeProjectionMode }> = [
       { label: l10n.t('Filesystem'), value: 'filesystem' },
       { label: l10n.t('Category'), value: 'category' },
-      { label: l10n.t('Status'), value: 'status' },
       { label: l10n.t('Tags'), value: 'tags' },
       { label: l10n.t('Project'), value: 'project' },
     ];

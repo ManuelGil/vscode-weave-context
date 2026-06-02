@@ -9,7 +9,7 @@ import { Uri } from 'vscode';
 export type SemanticGroupTreeNode = {
   type: 'semanticGroup';
   label: string;
-  projection: 'category' | 'status' | 'tags' | 'project';
+  projection: 'category' | 'tags' | 'project';
   key: string;
 };
 

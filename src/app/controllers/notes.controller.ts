@@ -36,6 +36,7 @@ import {
   parseSupportedSemanticFrontmatter,
   parseWikiLinkAtPosition,
   readFileContent,
+  upsertAliasesFrontmatterText,
 } from '../helpers';
 import { NotesService } from '../services';
 import type { OperationContext } from '../types';
@@ -530,9 +531,21 @@ export class NotesController {
         return markdown;
       }
 
+      const nextAliases = [...existing, trimmedAlias];
+      const rawFrontmatterText = parsed?.rawFrontmatter?.text;
+
+      if (typeof rawFrontmatterText === 'string') {
+        const updatedFrontmatterText = upsertAliasesFrontmatterText(
+          rawFrontmatterText,
+          nextAliases,
+        );
+        const body = parsed?.body ?? '';
+        return `---\n${updatedFrontmatterText}\n---\n${body}`;
+      }
+
       const mergedFrontmatter = {
         ...frontmatter,
-        aliases: [...existing, trimmedAlias],
+        aliases: nextAliases,
       };
       const body = parsed?.body ?? markdown;
       return composeSemanticMarkdown(mergedFrontmatter, body);
