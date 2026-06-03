@@ -1,6 +1,7 @@
 export * from './debounce.helper';
 export * from './error-message.helper';
 export * from './find-files.helper';
+export * from './markdown-wikilink-hover.helper';
 export * from './notes.helper';
 export * from './open-document.helper';
 export * from './path.helper';

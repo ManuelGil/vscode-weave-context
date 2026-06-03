@@ -262,13 +262,9 @@ export const parseRawFrontmatterFields = (
       continue;
     }
 
-    const firstNonEmptyLine = blockLines.find(
-      (blockLine) => blockLine.trim() !== '',
-    );
+    const blockValue = blockLines.join('\n').trimEnd();
 
-    fields[key] = firstNonEmptyLine
-      ? stripYamlQuotes(firstNonEmptyLine.trim())
-      : '';
+    fields[key] = blockValue;
   }
 
   return fields;

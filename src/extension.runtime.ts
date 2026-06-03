@@ -30,6 +30,7 @@ import {
 } from './app/helpers';
 import {
   FeedbackProvider,
+  MarkdownWikiLinkHoverProvider,
   MarkdownWikiLinkNavigationProvider,
   NoteRenameWatcherProvider,
   NotesTreeProvider,
@@ -418,15 +419,17 @@ export class ExtensionRuntime {
   }
 
   private registerNavigationProviders(): void {
-    if (!this.notesController) {
+    if (!this.notesController || !this.notesService) {
       return;
     }
 
     const provider = new MarkdownWikiLinkNavigationProvider(
       this.notesController,
     );
+    const hoverProvider = new MarkdownWikiLinkHoverProvider(this.notesService);
     const disposables = provider.register();
-    this.context.subscriptions.push(...disposables);
+    const hoverDisposable = hoverProvider.register();
+    this.context.subscriptions.push(...disposables, hoverDisposable);
   }
 
   private registerWikiLinkNoteRenameWatcher(): void {
