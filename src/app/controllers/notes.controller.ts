@@ -144,7 +144,7 @@ export class NotesController {
   }
 
   /**
-   * Inserts a Markdown link to a chosen note at the current cursor in the active editor.
+   * Inserts a canonical wikilink (with optional alias) for a chosen note at the current cursor.
    */
   async insertNoteLink(): Promise<void> {
     try {
@@ -170,12 +170,32 @@ export class NotesController {
         return;
       }
 
-      const noteUri = Uri.file(selected.note.filePath);
-      const relativePath = workspace.asRelativePath(noteUri, false);
-      const markdownLink = `[${selected.note.title}](${relativePath})`;
+      const canonicalStem = path
+        .basename(selected.note.filePath)
+        .replace(/\.md$/i, '');
+      const alias = selected.note.title?.trim();
+      const hasAlias =
+        alias &&
+        alias.length > 0 &&
+        alias.localeCompare(canonicalStem, undefined, {
+          sensitivity: 'base',
+        }) !== 0;
+      const wikiLink = hasAlias
+        ? `[[${canonicalStem}|${alias}]]`
+        : `[[${canonicalStem}]]`;
 
-      activeEditor.edit((editBuilder) => {
-        editBuilder.insert(activeEditor.selection.active, markdownLink);
+      const orderedSelections = [...activeEditor.selections].sort(
+        (left, right) => {
+          const leftOffset = activeEditor.document.offsetAt(left.active);
+          const rightOffset = activeEditor.document.offsetAt(right.active);
+          return rightOffset - leftOffset;
+        },
+      );
+
+      await activeEditor.edit((editBuilder) => {
+        orderedSelections.forEach((selection) => {
+          editBuilder.insert(selection.active, wikiLink);
+        });
       });
     } catch (error) {
       console.error('Error inserting note link:', error);
@@ -638,16 +658,7 @@ export class NotesController {
       const label =
         note.title?.trim() ||
         path.basename(note.filePath).replace(/\.md$/i, '');
-      const updatedText = l10n.t(
-        'Updated: {0}',
-        this.formatDate(note.updatedAt),
-      );
-      const tagsText =
-        note.tags && note.tags.length > 0
-          ? l10n.t('Tags: {0}', note.tags.join(', '))
-          : undefined;
-
-      const detail = tagsText ? `${updatedText} • ${tagsText}` : updatedText;
+      const detail = this.composeNoteQuickPickDetail(note);
 
       return {
         label,
@@ -656,5 +667,107 @@ export class NotesController {
         note,
       };
     });
+  }
+
+  private composeNoteQuickPickDetail(note: Note): string | undefined {
+    const summaryLine = this.formatSummary(note.summary);
+    const aliasesLine = this.formatAliases(note.aliases);
+    const tagsLine = this.formatTags(note.tags);
+    const categoryLine = this.formatLabeledValue(note.category, (value) =>
+      l10n.t('Category: {0}', value),
+    );
+    const projectLine = this.formatLabeledValue(note.project, (value) =>
+      l10n.t('Project: {0}', value),
+    );
+
+    const detailLines: string[] = [];
+
+    if (summaryLine) {
+      detailLines.push(summaryLine);
+    }
+
+    const metadataLines = [
+      aliasesLine,
+      tagsLine,
+      categoryLine,
+      projectLine,
+    ].filter((line): line is string => !!line);
+
+    if (metadataLines.length > 0) {
+      if (summaryLine) {
+        detailLines.push('');
+      }
+      detailLines.push(...metadataLines);
+    }
+
+    if (detailLines.length === 0) {
+      return undefined;
+    }
+
+    return detailLines.join('\n');
+  }
+
+  private formatSummary(summary?: string): string | undefined {
+    if (!summary) {
+      return undefined;
+    }
+
+    const normalized = summary
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .join(' ')
+      .trim();
+
+    return normalized.length > 0 ? normalized : undefined;
+  }
+
+  private formatAliases(aliases?: string[]): string | undefined {
+    if (!aliases) {
+      return undefined;
+    }
+
+    const normalizedAliases = aliases
+      .map((alias) => alias.trim())
+      .filter((alias) => alias.length > 0);
+
+    if (normalizedAliases.length === 0) {
+      return undefined;
+    }
+
+    return l10n.t('Aliases: {0}', normalizedAliases.join(', '));
+  }
+
+  private formatTags(tags?: string[]): string | undefined {
+    if (!tags) {
+      return undefined;
+    }
+
+    const normalizedTags = tags
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0)
+      .map((tag) => (tag.startsWith('#') ? tag : `#${tag}`));
+
+    if (normalizedTags.length === 0) {
+      return undefined;
+    }
+
+    return normalizedTags.join(' ');
+  }
+
+  private formatLabeledValue(
+    rawValue: string | undefined,
+    formatter: (value: string) => string,
+  ): string | undefined {
+    if (!rawValue) {
+      return undefined;
+    }
+
+    const trimmedValue = rawValue.trim();
+    if (trimmedValue.length === 0) {
+      return undefined;
+    }
+
+    return formatter(trimmedValue);
   }
 }

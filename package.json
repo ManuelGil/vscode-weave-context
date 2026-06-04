@@ -86,7 +86,6 @@
 					"enum": [
 						"filesystem",
 						"category",
-						"status",
 						"tags",
 						"project"
 					],

@@ -126,6 +126,16 @@ Start typing:
 
 to autocomplete semantic note references using canonical identities and aliases.
 
+### Insert canonical wikilinks
+
+Use the command palette entry:
+
+```text
+WeaveContext: Insert note link
+```
+
+to pick any note and insert a deterministic `[[slug]]` wikilink (or `[[slug|Title]]` when the note title differs from the canonical slug) at all active cursor locations.
+
 ## Filesystem-Backed Identity
 
 WeaveContext uses the filesystem as the canonical semantic identity layer.
@@ -231,8 +241,8 @@ Tree grouping uses one active projection at a time (`weaveContext.treeProjection
 
 - filesystem
 - category
-- status
 - tags
+- project
 
 NOT:
 
@@ -416,8 +426,8 @@ Weave Context provides a TreeView that surfaces a semantic perspective over the 
 | ---------- | ----------------------------- |
 | filesystem | physical workspace structure  |
 | category   | reasoning domains             |
-| status     | navigation confidence         |
 | tags       | lightweight semantic grouping |
+| project    | project-scoped navigation     |
 
 Behavior notes:
 

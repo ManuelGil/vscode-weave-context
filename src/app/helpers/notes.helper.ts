@@ -27,7 +27,7 @@ const normalizeTags = (tags?: string[]): string[] => {
  * Examples:
  *
  * category -> ['Backend']
- * status   -> ['In Progress']
+ * project  -> ['Auth Revamp']
  * tags     -> ['urgent', 'api']
  *
  * Empty values automatically resolve to fallback labels.

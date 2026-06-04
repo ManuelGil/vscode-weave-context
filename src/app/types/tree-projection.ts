@@ -9,9 +9,10 @@
  * Generic projection mode identifier.
  *
  * Determines how notes are grouped in the tree view:
- * - 'filesystem': Group by file system structure
+ * - 'filesystem': Group by filesystem structure
  * - 'category': Group by note category field
  * - 'tags': Group by note tags
+ * - 'project': Group by project metadata
  */
 export type TreeProjectionMode = 'filesystem' | 'category' | 'tags' | 'project';
 

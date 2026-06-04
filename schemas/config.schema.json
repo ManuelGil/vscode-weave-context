@@ -16,7 +16,7 @@
 		},
 		"weaveContext.treeProjection": {
 			"type": "string",
-			"enum": ["filesystem", "category", "status", "tags", "project"],
+			"enum": ["filesystem", "category", "tags", "project"],
 			"default": "filesystem",
 			"scope": "resource",
 			"description": "Single active grouping mode for the notes explorer."

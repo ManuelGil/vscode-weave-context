@@ -1,7 +1,7 @@
 import { Uri } from 'vscode';
 
 /**
- * Collapsible semantic grouping node used by projection modes like `category`, `status`, and `tags`.
+ * Collapsible semantic grouping node used by projection modes like `category`, `tags`, and `project`.
  * Flat, deterministic, and lightweight - groups have labels only and are expandable to file children.
  *
  * VS Code TreeView provider specific model - NOT reusable outside this extension.
@@ -32,7 +32,7 @@ export type FileTreeNode = {
  * Union of all tree node types used in the notes explorer.
  *
  * Supports three active projection modes:
- * - Semantic grouping (category, status, tags)
+ * - Semantic grouping (category, tags, project)
  * - Folder hierarchy (filesystem structure)
  * - Individual files
  *
