@@ -87,7 +87,7 @@ export class MarkdownWikiLinkHoverProvider {
     );
 
     if (contextLine.length > 0) {
-      markdown.appendMarkdown(`\n${escapeMarkdownText(contextLine)}`);
+      markdown.appendMarkdown(`\n\n_${escapeMarkdownText(contextLine)}_`);
     }
 
     const preview = buildWikiLinkHoverPreview(note.summary, note.content ?? '');

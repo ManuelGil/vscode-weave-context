@@ -1,6 +1,7 @@
 const MAX_PREVIEW_CHARACTERS = 200;
 const MAX_PREVIEW_LINES = 3;
 const MARKDOWN_ESCAPE_PATTERN = /([\\`*_{}\[\]()#+\-.!|>])/g;
+const STRUCTURAL_LINE_PATTERNS = [/^#{1,5}$/u, /^[-*+]$/u, /^\d+\.$/u];
 
 const appendLineToPreview = (
   previewLines: string[],
@@ -21,11 +22,23 @@ export const buildWikiLinkHoverContextLine = (
   category?: string,
   project?: string,
 ): string => {
-  const contextParts = [category, project]
-    .map((value) => value?.trim())
-    .filter((value): value is string => Boolean(value));
+  const contextParts: string[] = [];
 
-  return contextParts.join(' · ');
+  const trimmedCategory = category?.trim();
+  if (trimmedCategory) {
+    contextParts.push(`Category : ${trimmedCategory}`);
+  }
+
+  const trimmedProject = project?.trim();
+  if (trimmedProject) {
+    contextParts.push(`Project : ${trimmedProject}`);
+  }
+
+  if (contextParts.length === 0) {
+    return '';
+  }
+
+  return contextParts.join(' │ ');
 };
 
 export const escapeMarkdownText = (text: string): string =>
@@ -83,6 +96,10 @@ const extractPreviewFromBody = (body: string): string => {
       continue;
     }
 
+    if (isStructuralLine(trimmed)) {
+      continue;
+    }
+
     previewLines = appendLineToPreview(previewLines, trimmed);
 
     if (previewLines.length >= MAX_PREVIEW_LINES) {
@@ -96,4 +113,8 @@ const extractPreviewFromBody = (body: string): string => {
   }
 
   return truncatePreviewText(combined);
+};
+
+const isStructuralLine = (line: string): boolean => {
+  return STRUCTURAL_LINE_PATTERNS.some((pattern) => pattern.test(line));
 };
