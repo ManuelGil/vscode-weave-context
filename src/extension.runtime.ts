@@ -11,6 +11,7 @@ import {
   workspace,
 } from 'vscode';
 import { VSCodeMarketplaceClient } from 'vscode-marketplace-client';
+
 import {
   CommandIds,
   ContextKeys,
@@ -29,6 +30,7 @@ import {
   showNoWorkspaceFolderError,
 } from './app/helpers';
 import {
+  ContextViewProvider,
   FeedbackProvider,
   MarkdownWikiLinkHoverProvider,
   MarkdownWikiLinkNavigationProvider,
@@ -53,6 +55,7 @@ export class ExtensionRuntime {
   private notesService: NotesService | undefined;
   private notesController: NotesController | undefined;
   private notesTreeProvider: NotesTreeProvider | undefined;
+  private graphProvider: ContextViewProvider | undefined;
 
   constructor(public readonly context: ExtensionContext) {}
 
@@ -81,6 +84,7 @@ export class ExtensionRuntime {
     this.registerWikiLinkNoteRenameWatcher();
     this.registerTreeViews();
     this.registerFileWatchers();
+    this.registerGraphView();
     this.registerFeedbackCommands();
   }
 
@@ -569,6 +573,29 @@ export class ExtensionRuntime {
 
     // Register disposables for automatic cleanup.
     this.context.subscriptions.push(watcher);
+  }
+
+  /**
+   * Registers the ContextViewProvider to provide the graph view in the extension.
+   * The provider is responsible for rendering the webview and handling communication with it.
+   */
+  private registerGraphView(): void {
+    if (!this.notesService) {
+      return;
+    }
+
+    this.graphProvider = new ContextViewProvider(
+      this.context.extensionUri,
+      this.notesService,
+    );
+
+    const disposableGraphView = window.registerWebviewViewProvider(
+      ContextViewProvider.viewType,
+      this.graphProvider,
+    );
+
+    this.providers.push(this.graphProvider);
+    this.context.subscriptions.push(this.graphProvider, disposableGraphView);
   }
 
   /**

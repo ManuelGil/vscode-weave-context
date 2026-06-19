@@ -1,6 +1,6 @@
 {
 	"name": "vscode-weave-context",
-	"displayName": "WeaveContext",
+	"displayName": "Weave Context",
 	"description": "Navigate markdown workspaces with wikilinks, Note Map projections, native editor workflows, and local visual graph exploration.",
 	"version": "1.0.0",
 	"preview": true,
@@ -67,7 +67,7 @@
 	"contributes": {
 		"configuration": {
 			"type": "object",
-			"title": "WeaveContext Configuration",
+			"title": "Weave Context Configuration",
 			"properties": {
 				"weaveContext.enable": {
 					"type": "boolean",
@@ -99,57 +99,57 @@
 			{
 				"command": "weaveContext.changeWorkspace",
 				"title": "%weaveContext.changeWorkspace.title%",
-				"category": "WeaveContext"
+				"category": "Weave Context"
 			},
 			{
 				"command": "weaveContext.createProjectNote",
 				"title": "%weaveContext.createProjectNote.title%",
-				"category": "WeaveContext"
+				"category": "Weave Context"
 			},
 			{
 				"command": "weaveContext.openProjectNote",
 				"title": "%weaveContext.openProjectNote.title%",
-				"category": "WeaveContext"
+				"category": "Weave Context"
 			},
 			{
 				"command": "weaveContext.insertNoteLink",
 				"title": "%weaveContext.insertNoteLink.title%",
-				"category": "WeaveContext"
+				"category": "Weave Context"
 			},
 			{
 				"command": "weaveContext.switchTreeProjection",
 				"title": "%weaveContext.switchTreeProjection.title%",
-				"category": "WeaveContext",
+				"category": "Weave Context",
 				"icon": "$(list-tree)"
 			},
 			{
 				"command": "weaveContext.notesExplorer.refreshList",
 				"title": "%weaveContext.notesExplorer.refreshList.title%",
-				"category": "WeaveContext",
+				"category": "Weave Context",
 				"icon": "$(refresh)"
 			},
 			{
 				"command": "weaveContext.feedback.aboutUs",
 				"title": "%weaveContext.feedback.aboutUs%",
-				"category": "WeaveContext",
+				"category": "Weave Context",
 				"icon": "$(info)"
 			},
 			{
 				"command": "weaveContext.feedback.reportIssues",
 				"title": "%weaveContext.feedback.reportIssues%",
-				"category": "WeaveContext",
+				"category": "Weave Context",
 				"icon": "$(bug)"
 			},
 			{
 				"command": "weaveContext.feedback.rateUs",
 				"title": "%weaveContext.feedback.rateUs%",
-				"category": "WeaveContext",
+				"category": "Weave Context",
 				"icon": "$(star)"
 			},
 			{
 				"command": "weaveContext.feedback.supportUs",
 				"title": "%weaveContext.feedback.supportUs%",
-				"category": "WeaveContext",
+				"category": "Weave Context",
 				"icon": "$(heart)"
 			}
 		],
@@ -191,6 +191,13 @@
 					"icon": "$(folder)"
 				},
 				{
+					"id": "weaveContext.contextView",
+					"name": "%weaveContext.contextView.title%",
+					"type": "webview",
+					"visibility": "visible",
+					"icon": "$(graph)"
+				},
+				{
 					"id": "weaveContext.feedbackView",
 					"name": "%weaveContext.feedbackView%",
 					"visibility": "visible",
@@ -207,13 +214,16 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "pnpm compile",
-		"typecheck": "tsc --noEmit -p ./",
-		"compile": "pnpm typecheck && rimraf out && esbuild src/extension.ts --bundle --platform=node --target=node22 --format=cjs --external:vscode --outfile=out/extension.js --minify",
+		"typecheck:extension": "tsc --noEmit -p tsconfig.json",
+		"typecheck:webview": "vue-tsc --noEmit -p tsconfig.webview.json",
+		"typecheck": "run-p typecheck:*",
+		"compile": "pnpm typecheck:extension && rimraf out && esbuild src/extension.ts --bundle --platform=node --target=node22 --format=cjs --external:vscode --outfile=out/extension.js",
 		"watch": "tsc -watch -p ./",
-		"pretest": "pnpm compile && tsc -p ./ && pnpm lint",
-		"dev": "vite --mode development",
-		"build": "tsc --p ./tsconfig.web.json && vite build --mode production && vite build --mode production --config vite.config.worker.ts",
+		"pretest": "pnpm typecheck && pnpm compile && pnpm lint",
+		"dev": "vite",
+		"build": "pnpm typecheck:webview && vite build --mode production && vite build --mode production --config vite.config.worker.ts",
 		"preview": "vite preview",
+		"build-only": "vite build",
 		"format": "biome format --write .",
 		"lint": "biome lint .",
 		"lint:fix": "biome lint --write .",
@@ -226,34 +236,47 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.4.16",
+		"@biomejs/biome": "2.5.0",
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
+		"@tsconfig/node24": "^24.0.4",
 		"@types/mocha": "^10.0.10",
-		"@types/mustache": "^4.2.6",
-		"@types/node": "^22.19.19",
+		"@types/node": "^22.19.21",
 		"@types/vscode": "^1.102.0",
+		"@vitejs/plugin-vue": "^6.0.7",
 		"@vscode/l10n-dev": "^0.0.35",
 		"@vscode/test-cli": "^0.0.12",
 		"@vscode/test-electron": "^2.5.2",
-		"esbuild": "^0.28.0",
+		"@vue/tsconfig": "^0.9.1",
+		"esbuild": "^0.28.1",
+		"glob": "^11.1.0",
 		"husky": "^9.1.7",
-		"lint-staged": "^16.4.0",
+		"lint-staged": "^15.5.2",
+		"minimatch": "^10.2.5",
 		"mocha": "^11.7.6",
+		"npm-run-all2": "^8.0.4",
 		"rimraf": "^6.1.3",
-		"typescript": "^5.9.3"
+		"typescript": "^6.0.3",
+		"vite": "^8.0.16",
+		"vite-plugin-vue-devtools": "^8.1.3",
+		"vue-tsc": "^3.3.5"
 	},
 	"dependencies": {
 		"@supercharge/promise-pool": "^3.3.0",
 		"fast-glob": "^3.3.3",
+		"graphology": "^0.26.0",
 		"ignore": "^7.0.5",
-		"mustache": "^4.2.0",
-		"vscode-marketplace-client": "^1.2.3"
+		"sigma": "^3.0.3",
+		"vscode-marketplace-client": "^1.2.4",
+		"vue": "^3.5.38"
 	},
 	"pnpm": {
 		"overrides": {
 			"diff@>=6.0.0 <8.0.3": ">=8.0.3",
-			"serialize-javascript@>=5.0.0 <7.0.5": ">=7.0.5"
+			"serialize-javascript@>=5.0.0 <7.0.5": ">=7.0.5",
+			"form-data@>=4.0.0 <4.0.6": ">=4.0.6",
+			"js-yaml@<=4.1.1": ">=4.2.0",
+			"markdown-it@<=14.1.1": ">=14.2.0"
 		},
 		"onlyBuiltDependencies": [
 			"esbuild"

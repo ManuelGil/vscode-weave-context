@@ -1,3 +1,4 @@
+export * from './context-view.provider';
 export * from './feedback.provider';
 export * from './markdown-wikilink-hover.provider';
 export * from './markdown-wikilink-navigation.provider';

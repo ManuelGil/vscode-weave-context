@@ -10,6 +10,7 @@ export * from './read-file-content.helper';
 export * from './relative-path.helper';
 export * from './resolve.helper';
 export * from './save-file.helper';
+export * from './security.helper';
 export * from './semantic-frontmatter.helper';
 export * from './text.helper';
 export * from './text-normalization.helper';

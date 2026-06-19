@@ -260,7 +260,6 @@ export class NotesService {
       return null;
     }
 
-    const now = new Date();
     const sanitizedStem = this.sanitizeFilename(title);
     const fileUri = Uri.joinPath(this.notesDir, `${sanitizedStem}.md`);
 
@@ -268,8 +267,6 @@ export class NotesService {
       title,
       content,
       filePath: fileUri.fsPath,
-      createdAt: now,
-      updatedAt: now,
       tags,
     };
 
@@ -279,8 +276,6 @@ export class NotesService {
         {
           title: note.title,
           category: note.category,
-          created: note.createdAt.toISOString(),
-          updated: note.updatedAt.toISOString(),
           status: note.status,
           project: note.project,
           tags: note.tags,
@@ -307,7 +302,7 @@ export class NotesService {
   }
 
   /**
-   * Persists `note` with an updated `updatedAt` timestamp. Returns `null` if the file does not exist.
+   * Persists `note`. Returns `null` if the file does not exist.
    */
   async updateNote(note: Note): Promise<Note | null> {
     try {
@@ -318,7 +313,6 @@ export class NotesService {
 
     const updatedNote: Note = {
       ...note,
-      updatedAt: new Date(),
     };
 
     try {
@@ -330,8 +324,6 @@ export class NotesService {
         {
           title: updatedNote.title,
           category: updatedNote.category,
-          created: updatedNote.createdAt.toISOString(),
-          updated: updatedNote.updatedAt.toISOString(),
           status: updatedNote.status,
           project: updatedNote.project,
           tags: updatedNote.tags,
@@ -400,19 +392,11 @@ export class NotesService {
       const noteContent = parsed?.body ?? content.trim();
 
       const fileName = basenameFromFsPath(fileUri.fsPath).replace(/\.md$/i, '');
-      const createdAt = frontmatter.created
-        ? new Date(frontmatter.created)
-        : new Date(0);
-      const updatedAt = frontmatter.updated
-        ? new Date(frontmatter.updated)
-        : new Date(0);
 
       return {
         title: frontmatter.title ?? fileName,
         content: noteContent,
         filePath: fileUri.fsPath,
-        createdAt,
-        updatedAt,
         ...(frontmatter.tags !== undefined ? { tags: frontmatter.tags } : {}),
         ...(frontmatter.category !== undefined
           ? { category: frontmatter.category }

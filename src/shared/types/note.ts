@@ -39,8 +39,6 @@ export interface Note {
   title: string;
   content: string;
   filePath: string;
-  createdAt: Date;
-  updatedAt: Date;
   tags?: string[];
   aliases?: string[];
   status?: string;

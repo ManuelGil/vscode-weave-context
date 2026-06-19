@@ -1,4 +1,4 @@
-# WeaveContext
+# Weave Context
 
 [![GitHub package.json version](https://img.shields.io/github/package-json/v/ManuelGil/vscode-weave-context?style=for-the-badge&logo=github)](https://marketplace.visualstudio.com/items?itemName=imgildev.vscode-weave-context)
 [![GitHub Repo Stars](https://img.shields.io/github/stars/ManuelGil/vscode-weave-context?style=for-the-badge&logo=github)](https://github.com/ManuelGil/vscode-weave-context)
@@ -6,9 +6,9 @@
 
 > Navigate your notes like code
 
-WeaveContext brings native semantic navigation to markdown inside VS Code.
+Weave Context brings native semantic navigation to markdown inside VS Code.
 
-Instead of treating notes as isolated documents, WeaveContext treats markdown references like editor symbols:
+Instead of treating notes as isolated documents, Weave Context treats markdown references like editor symbols:
 
 - Ctrl+Click to navigate between ideas
 - Rename semantic references safely
@@ -35,7 +35,7 @@ Eventually the problem becomes:
 
 > “Where did I see this?”
 
-WeaveContext helps recover and navigate context directly inside the editor.
+Weave Context helps recover and navigate context directly inside the editor.
 
 ## What Makes It Different
 
@@ -45,7 +45,7 @@ Most markdown knowledge tools focus on:
 - note management
 - workspace organization
 
-WeaveContext focuses on:
+Weave Context focuses on:
 
 ```text
 semantic editor navigation
@@ -63,7 +63,7 @@ That means:
 
 ## Semantic Wikilinks
 
-WeaveContext supports semantic wikilinks with canonical navigation behavior.
+Weave Context supports semantic wikilinks with canonical navigation behavior.
 
 ```md
 [[login-flow]]
@@ -84,7 +84,7 @@ while preserving deterministic canonical identity.
 
 ## Native Editor Workflows
 
-WeaveContext integrates directly into native VS Code workflows.
+Weave Context integrates directly into native VS Code workflows.
 
 ### Go to Definition
 
@@ -131,14 +131,14 @@ to autocomplete semantic note references using canonical identities and aliases.
 Use the command palette entry:
 
 ```text
-WeaveContext: Insert note link
+Weave Context: Insert note link
 ```
 
 to pick any note and insert a deterministic `[[slug]]` wikilink (or `[[slug|Title]]` when the note title differs from the canonical slug) at all active cursor locations.
 
 ## Filesystem-Backed Identity
 
-WeaveContext uses the filesystem as the canonical semantic identity layer.
+Weave Context uses the filesystem as the canonical semantic identity layer.
 
 This keeps references:
 
@@ -151,7 +151,7 @@ No hidden databases or proprietary note formats are required.
 
 ## Semantic Frontmatter
 
-WeaveContext supports lightweight semantic frontmatter for navigation-oriented metadata.
+Weave Context supports lightweight semantic frontmatter for navigation-oriented metadata.
 
 ```yaml
 ---
@@ -171,7 +171,7 @@ Frontmatter remains:
 - portable
 - filesystem-friendly
 
-WeaveContext does not use markdown as a database or workflow engine.
+Weave Context does not use markdown as a database or workflow engine.
 
 ### Aliases
 
@@ -224,7 +224,7 @@ It does not affect:
 
 ## Semantic Workspace Index
 
-WeaveContext includes a lightweight semantic workspace explorer integrated into the VS Code sidebar.
+Weave Context includes a lightweight semantic workspace explorer integrated into the VS Code sidebar.
 
 The workspace index is derived from:
 
@@ -252,7 +252,7 @@ NOT:
 
 ## Philosophy
 
-WeaveContext is built around a simple principle:
+Weave Context is built around a simple principle:
 
 ```text
 Context should be navigable like code.
@@ -266,7 +266,7 @@ The goal is to reduce the cognitive friction of recovering context while working
 
 ### Native editor behavior first
 
-WeaveContext prioritizes:
+Weave Context prioritizes:
 
 - Go to Definition
 - Find References
@@ -289,7 +289,7 @@ No hidden semantic layers or opaque indexing systems are required.
 
 Metadata exists only if it strengthens semantic navigation.
 
-WeaveContext intentionally avoids:
+Weave Context intentionally avoids:
 
 - workflow systems
 - complex schemas
@@ -305,11 +305,11 @@ Markdown files remain:
 - repository-friendly
 - editor-independent
 
-WeaveContext enhances markdown navigation without locking notes into proprietary formats.
+Weave Context enhances markdown navigation without locking notes into proprietary formats.
 
 ## Visualization & Context Exploration
 
-WeaveContext is evolving toward richer context exploration capabilities, including:
+Weave Context is evolving toward richer context exploration capabilities, including:
 
 - semantic visualization
 - contextual navigation views
@@ -352,10 +352,10 @@ Navigate between related ideas using native editor workflows:
 
 ## Installation
 
-Install **WeaveContext** from the VS Code Marketplace:
+Install **Weave Context** from the VS Code Marketplace:
 
 ```text
-Extensions → Search: WeaveContext
+Extensions → Search: Weave Context
 ```
 
 or install directly from the Marketplace page:
@@ -392,7 +392,7 @@ to navigate semantic context directly inside VS Code.
 
 ## Recommended Structure
 
-WeaveContext works with standard markdown files and does not require a rigid workspace structure.
+Weave Context works with standard markdown files and does not require a rigid workspace structure.
 
 Example:
 
@@ -490,7 +490,7 @@ Future capabilities will continue building on:
 
 ## Philosophy Recap
 
-WeaveContext is not trying to replace markdown.
+Weave Context is not trying to replace markdown.
 
 It is not trying to replace your editor.
 
@@ -504,7 +504,7 @@ make context navigable with the same fluency as code
 
 ## AI Skills & Contextual Workflows
 
-WeaveContext works independently as a deterministic semantic navigation layer for markdown inside VS Code.
+Weave Context works independently as a deterministic semantic navigation layer for markdown inside VS Code.
 
 For developers using AI-assisted workflows, optional companion skills are available for tools such as:
 
@@ -520,7 +520,7 @@ These skills help agents better understand:
 - workflow continuity
 - and contextual navigation patterns
 
-while preserving the same filesystem-first and deterministic design principles used by WeaveContext itself.
+while preserving the same filesystem-first and deterministic design principles used by Weave Context itself.
 
 Skills are completely optional and designed to complement native editor workflows rather than replace them.
 
@@ -532,7 +532,7 @@ Repository:
 
 ## Contributing
 
-WeaveContext is open-source and welcomes community contributions:
+Weave Context is open-source and welcomes community contributions:
 
 1. Fork the [GitHub repository](https://github.com/ManuelGil/vscode-weave-context).
 2. Create a new branch:

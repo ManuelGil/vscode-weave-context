@@ -594,20 +594,6 @@ export class NotesController {
   }
 
   /**
-   * Formats a date for user-facing UI (locale-aware, includes time).
-   * @private
-   */
-  private formatDate(date: Date): string {
-    return date.toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  }
-
-  /**
    * If notes list is empty, prompts the user to create a new note.
    * Returns `true` if the list was empty (user was prompted), `false` otherwise.
    * @private
