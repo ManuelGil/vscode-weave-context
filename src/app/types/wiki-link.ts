@@ -1,5 +1,12 @@
 import { Range } from 'vscode';
 
+export type WikiLinkReference = {
+  sourceFilePath: string;
+  targetReference: string;
+  targetFilePath: string;
+  range: Range;
+};
+
 /**
  * Parsed Obsidian-style wiki link model.
  *

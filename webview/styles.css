@@ -6,4 +6,37 @@ body,
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background: var(--vscode-sideBar-background);
+  color: var(--vscode-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+
+  /* Graph visual properties derived from VSCode theme */
+  --graph-node-focus-color: var(--vscode-foreground);
+  --graph-node-backlink-color: color-mix(
+    in srgb,
+    var(--vscode-foreground) 70%,
+    transparent
+  );
+  --graph-node-outgoing-color: color-mix(
+    in srgb,
+    var(--vscode-foreground) 88%,
+    transparent
+  );
+  --graph-node-highlight: var(--vscode-textLink-activeForeground);
+  --graph-node-backlink-border: var(--vscode-charts-orange, #ce9178);
+  --graph-node-outgoing-border: var(--vscode-charts-blue, #75beff);
+  --graph-node-focus-border: var(
+    --vscode-focusBorder,
+    var(--vscode-foreground)
+  );
+  --graph-edge-color: color-mix(
+    in srgb,
+    var(--vscode-foreground) 50%,
+    transparent
+  );
+  --graph-edge-highlight: var(--vscode-textLink-activeForeground);
+  --graph-label-color: var(--vscode-foreground);
+  --graph-label-muted: var(--vscode-descriptionForeground);
+  --graph-empty-message: var(--vscode-descriptionForeground);
 }

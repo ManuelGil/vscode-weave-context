@@ -1,5 +1,7 @@
 import { Position, Range, TextDocument } from 'vscode';
 
+import { basenameFromFsPath } from './path-format.helper';
+
 /**
  * Parses Obsidian-style wiki links:
  *
@@ -13,6 +15,25 @@ import { Position, Range, TextDocument } from 'vscode';
  * {@link ParsedWikiLink.label} is presentational.
  */
 import { ParsedWikiLink, ParsedWikiLinkText, WikiLinkMatch } from '../types';
+
+/**
+ * Normalizes wikilink references into canonical, lowercase slug-like tokens.
+ * Removes extensions, collapses whitespace/underscores into hyphens, and trims dashes.
+ */
+export const normalizeWikiLinkReference = (value: string): string => {
+  return value
+    .trim()
+    .replace(/\.md$/i, '')
+    .replace(/[_\s]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase();
+};
+
+/** Returns the canonical wikilink stem for a note file path. */
+export const getWikiLinkCanonicalStem = (filePath: string): string => {
+  return basenameFromFsPath(filePath).replace(/\.md$/i, '').trim();
+};
 
 /**
  * Regex that matches wiki links on a single line.

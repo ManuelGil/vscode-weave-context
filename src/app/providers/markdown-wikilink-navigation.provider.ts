@@ -44,14 +44,15 @@ export class MarkdownWikiLinkNavigationProvider {
               ? `${hit.target} (${hit.label})`
               : hit.target;
 
-            symbols.push({
-              name: displayName,
-              detail: 'wikilink',
-              kind: SymbolKind.Interface,
-              range: fullRange,
-              selectionRange: fullRange,
-              children: [],
-            });
+            symbols.push(
+              new DocumentSymbol(
+                displayName,
+                'wikilink',
+                SymbolKind.Interface,
+                fullRange,
+                fullRange,
+              ),
+            );
           }
         }
 

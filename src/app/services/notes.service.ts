@@ -1,31 +1,19 @@
 import path from 'path';
-import { FileSystemError, Uri, workspace } from 'vscode';
+import { FileSystemError, Range, Uri, workspace } from 'vscode';
 
 import type { Note } from '../../shared/types/note';
 import { DEFAULT_NOTES_ROOT_SETTING, ExtensionConfig } from '../configs';
 import {
-  basenameFromFsPath,
   composeSemanticMarkdown,
   findFiles,
+  findWikiLinksInLine,
+  getWikiLinkCanonicalStem,
   getWorkspaceFolderUri,
+  normalizeWikiLinkReference,
   parseSupportedSemanticFrontmatter,
   readFileContent,
 } from '../helpers';
-import type { OperationContext } from '../types';
-
-/**
- * Normalizes wikilink references into canonical, lowercase slug-like tokens.
- * Removes extensions, collapses whitespace/underscores into hyphens, and trims dashes.
- */
-const normalizeWikiLinkReference = (value: string): string => {
-  return value
-    .trim()
-    .replace(/\.md$/i, '')
-    .replace(/[_\s]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .toLowerCase();
-};
+import type { OperationContext, WikiLinkReference } from '../types';
 
 /**
  * Reads and writes project notes as Markdown files with YAML frontmatter under the configured notes folder.
@@ -151,9 +139,7 @@ export class NotesService {
       } | null = null;
 
       for (const uri of noteUris) {
-        const canonicalStem = basenameFromFsPath(uri.fsPath)
-          .replace(/\.md$/i, '')
-          .trim();
+        const canonicalStem = getWikiLinkCanonicalStem(uri.fsPath);
         const normalizedStem = normalizeWikiLinkReference(canonicalStem);
 
         if (normalizedStem !== normalizedInput) {
@@ -217,9 +203,7 @@ export class NotesService {
 
         aliasHit = {
           uri,
-          canonicalStem: basenameFromFsPath(uri.fsPath)
-            .replace(/\.md$/i, '')
-            .trim(),
+          canonicalStem: getWikiLinkCanonicalStem(uri.fsPath),
           aliases: aliasCandidates,
           matchedAlias: matchingAlias.raw,
         };
@@ -246,6 +230,133 @@ export class NotesService {
     } catch {
       return [];
     }
+  }
+
+  /** Builds the exact and alias target strings used for reference matching. */
+  buildWikiLinkSemanticTargets(
+    canonicalStem: string,
+    aliases: readonly string[],
+  ): Set<string> {
+    return new Set(
+      [canonicalStem, ...aliases]
+        .map((entry) => entry.trim())
+        .filter((entry) => entry.length > 0),
+    );
+  }
+
+  /** Returns semantic targets for a note file path (stem + frontmatter aliases). */
+  async getWikiLinkSemanticTargetsForFile(filePath: string): Promise<Set<string>> {
+    const canonicalStem = getWikiLinkCanonicalStem(filePath);
+    const aliases = await this.getWikiLinkAliases(Uri.file(filePath));
+
+    return this.buildWikiLinkSemanticTargets(canonicalStem, aliases);
+  }
+
+  /**
+   * Returns true when a wikilink target refers to one of the semantic targets.
+   *
+   * Matches both exact strings and normalized slug equality, aligning with
+   * {@link NotesService.resolveMarkdownWikiLink}.
+   */
+  wikilinkTargetMatchesSemanticTargets(
+    targetReference: string,
+    semanticTargets: ReadonlySet<string> | readonly string[],
+  ): boolean {
+    const trimmed = targetReference.trim();
+
+    if (!trimmed) {
+      return false;
+    }
+
+    const targets =
+      semanticTargets instanceof Set
+        ? semanticTargets
+        : new Set(semanticTargets);
+
+    if (targets.has(trimmed)) {
+      return true;
+    }
+
+    const normalizedHit = normalizeWikiLinkReference(trimmed);
+
+    if (!normalizedHit) {
+      return false;
+    }
+
+    for (const target of targets) {
+      if (normalizeWikiLinkReference(target) === normalizedHit) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Reads markdown for wikilink scanning, preferring in-memory editor buffers.
+   *
+   * Aligns reference, navigation-adjacent, and Context View flows on the same
+   * content source: open documents use their current buffer; otherwise disk.
+   */
+  async readMarkdownContentForWikiLinks(
+    filePath: string,
+  ): Promise<string | null> {
+    try {
+      const document = await workspace.openTextDocument(Uri.file(filePath));
+
+      return document.getText();
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Scans workspace notes for wikilinks that refer to the target note.
+   */
+  async findWikiLinkReferencesTo(
+    targetFilePath: string,
+    context: OperationContext = {},
+    readNoteContent: (filePath: string) => Promise<string | null> = (
+      filePath,
+    ) => this.readMarkdownContentForWikiLinks(filePath),
+  ): Promise<WikiLinkReference[]> {
+    const semanticTargets =
+      await this.getWikiLinkSemanticTargetsForFile(targetFilePath);
+    const noteUris = await this.discoverNoteFileUrisThroughContext(context);
+    const references: WikiLinkReference[] = [];
+
+    for (const uri of noteUris) {
+      if (uri.fsPath === targetFilePath) {
+        continue;
+      }
+
+      const content = await readNoteContent(uri.fsPath);
+
+      if (content === null) {
+        continue;
+      }
+
+      const lines = content.split(/\r?\n/);
+
+      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+        const hits = findWikiLinksInLine(lines[lineIndex], lineIndex);
+
+        for (const hit of hits) {
+          if (
+            this.wikilinkTargetMatchesSemanticTargets(hit.target, semanticTargets)
+          ) {
+            references.push({
+              sourceFilePath: uri.fsPath,
+              targetReference: hit.target,
+              targetFilePath,
+              range: hit.range as Range,
+            });
+          }
+        }
+      }
+    }
+
+    return references;
   }
 
   /**
@@ -391,7 +502,7 @@ export class NotesService {
       const frontmatter = parsed?.frontmatter ?? {};
       const noteContent = parsed?.body ?? content.trim();
 
-      const fileName = basenameFromFsPath(fileUri.fsPath).replace(/\.md$/i, '');
+      const fileName = getWikiLinkCanonicalStem(fileUri.fsPath);
 
       return {
         title: frontmatter.title ?? fileName,

@@ -32,6 +32,7 @@ import {
   clearCache,
   composeSemanticMarkdown,
   findWikiLinksInLine,
+  getWikiLinkCanonicalStem,
   openDocument,
   parseSupportedSemanticFrontmatter,
   parseWikiLinkAtPosition,
@@ -264,11 +265,10 @@ export class NotesController {
     }
 
     const aliases = await this.notesService.getWikiLinkAliases(targetUri);
-    const canonicalStem = path.basename(targetUri.fsPath).replace(/\.md$/i, '');
-    const semanticTargets = new Set(
-      [canonicalStem, ...aliases]
-        .map((entry) => entry.trim())
-        .filter((entry) => entry.length > 0),
+    const canonicalStem = getWikiLinkCanonicalStem(targetUri.fsPath);
+    const semanticTargets = this.notesService.buildWikiLinkSemanticTargets(
+      canonicalStem,
+      aliases,
     );
 
     if (
@@ -362,36 +362,16 @@ export class NotesController {
       return [];
     }
 
-    const canonicalStem = path.basename(targetUri.fsPath).replace(/\.md$/i, '');
-    const aliases = await this.notesService.getWikiLinkAliases(targetUri);
-    const semanticTargets = [canonicalStem, ...aliases];
-
     const context: OperationContext = {};
-    const noteUris =
-      await this.notesService.discoverNoteFileUrisThroughContext(context);
+    const references = await this.notesService.findWikiLinkReferencesTo(
+      targetUri.fsPath,
+      context,
+    );
 
-    const references: Location[] = [];
-
-    for (const uri of noteUris) {
-      let doc: TextDocument;
-      try {
-        doc = await workspace.openTextDocument(uri);
-      } catch {
-        continue;
-      }
-
-      const lines = doc.getText().split(/\r?\n/);
-      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-        const hits = findWikiLinksInLine(lines[lineIndex], lineIndex);
-        for (const hit of hits) {
-          if (semanticTargets.includes(hit.target)) {
-            references.push(new Location(uri, hit.range as Range));
-          }
-        }
-      }
-    }
-
-    return references;
+    return references.map(
+      (reference) =>
+        new Location(Uri.file(reference.sourceFilePath), reference.range),
+    );
   }
 
   async provideWikiLinkCompletions(
@@ -460,10 +440,9 @@ export class NotesController {
     clearCache();
 
     const aliases = await this.notesService.getWikiLinkAliases(newUri);
-    const semanticTargets = new Set(
-      [oldStem, ...aliases]
-        .map((entry) => entry.trim())
-        .filter((entry) => entry.length > 0),
+    const semanticTargets = this.notesService.buildWikiLinkSemanticTargets(
+      oldStem,
+      aliases,
     );
 
     const context: OperationContext = {};
@@ -508,7 +487,10 @@ export class NotesController {
     const lines = markdown.split(/\r?\n/);
     const rewritten = lines.map((line) => {
       const hits = findWikiLinksInLine(line).filter((hit) =>
-        semanticTargets.has(hit.target),
+        this.notesService.wikilinkTargetMatchesSemanticTargets(
+          hit.target,
+          semanticTargets,
+        ),
       );
 
       if (hits.length === 0) {
