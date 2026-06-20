@@ -21,7 +21,6 @@ const containerRef = useTemplateRef<HTMLDivElement>("container");
 
 const hoveredNode = ref<string | null>(null);
 const selectedNode = ref<string | null>(null);
-const showEmptyState = ref(false);
 const hoverDetails = ref<HoverDetails | null>(null);
 
 let worker: Worker | undefined;
@@ -45,11 +44,6 @@ const renderGraph = (payload: RenderPayload) => {
 
   latestNodes = payload.nodes;
   latestEdges = payload.edges;
-
-  const neighborCount = latestNodes.filter(
-    (node) => node.role !== "focus",
-  ).length;
-  showEmptyState.value = neighborCount === 0;
 
   contextRenderer.mount(
     container,
@@ -221,9 +215,6 @@ onBeforeUnmount(() => {
 <template>
   <div class="graph-shell">
     <div ref="container" class="graph-container" />
-    <div v-if="showEmptyState" class="empty-state">
-      No wikilink connections found
-    </div>
     <div
       v-if="hoverDetails"
       class="hover-tooltip"
@@ -233,21 +224,29 @@ onBeforeUnmount(() => {
       }"
     >
       <div class="hover-tooltip-title">{{ hoverDetails.title }}</div>
-      <div class="hover-tooltip-row">
-        <span class="hover-tooltip-label">Incoming</span>
-        <span>{{
-          hoverDetails.incoming.length > 0
-            ? hoverDetails.incoming.join(", ")
-            : "—"
-        }}</span>
+      <div class="hover-tooltip-summary">
+        <div>Incoming ({{ hoverDetails.incoming.length }})</div>
+        <div>Outgoing ({{ hoverDetails.outgoing.length }})</div>
       </div>
-      <div class="hover-tooltip-row">
-        <span class="hover-tooltip-label">Outgoing</span>
-        <span>{{
-          hoverDetails.outgoing.length > 0
-            ? hoverDetails.outgoing.join(", ")
-            : "—"
-        }}</span>
+      <div v-if="hoverDetails.incoming.length > 0" class="hover-tooltip-section">
+        <div class="hover-tooltip-label">Incoming:</div>
+        <div
+          v-for="item in hoverDetails.incoming"
+          :key="`in-${item}`"
+          class="hover-tooltip-item"
+        >
+          {{ item }}
+        </div>
+      </div>
+      <div v-if="hoverDetails.outgoing.length > 0" class="hover-tooltip-section">
+        <div class="hover-tooltip-label">Outgoing:</div>
+        <div
+          v-for="item in hoverDetails.outgoing"
+          :key="`out-${item}`"
+          class="hover-tooltip-item"
+        >
+          {{ item }}
+        </div>
       </div>
     </div>
   </div>
@@ -268,57 +267,46 @@ onBeforeUnmount(() => {
   background: transparent;
 }
 
-.empty-state {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  pointer-events: none;
-  text-align: center;
-  color: var(--graph-empty-message);
-  font-family: var(--vscode-font-family);
-  font-size: var(--vscode-font-size);
-}
-
 .hover-tooltip {
   position: absolute;
   z-index: 4;
-  max-width: 220px;
+  max-width: 240px;
   padding: 8px 10px;
-  border: 1px solid
-    color-mix(in srgb, var(--vscode-foreground) 25%, transparent);
-  border-radius: 4px;
-  background: color-mix(
-    in srgb,
-    var(--vscode-editor-background) 92%,
-    transparent
-  );
+  border: 1px solid var(--graph-tooltip-border, var(--vscode-widget-border));
+  border-radius: var(--vscode-widget-border-radius, 4px);
+  background: var(--graph-tooltip-background);
+  box-shadow: var(--graph-tooltip-shadow);
   color: var(--vscode-foreground);
   font-family: var(--vscode-editor-font-family, var(--vscode-font-family));
-  font-size: 11px;
+  font-size: var(--vscode-editor-font-size, var(--vscode-font-size));
   line-height: 1.45;
   pointer-events: none;
 }
 
 .hover-tooltip-title {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   font-weight: 600;
 }
 
-.hover-tooltip-row {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 4px;
+.hover-tooltip-summary {
+  margin-bottom: 6px;
+  color: var(--graph-label-muted);
+  font-size: calc(var(--vscode-font-size) * 0.9);
+}
+
+.hover-tooltip-section {
+  margin-top: 6px;
 }
 
 .hover-tooltip-label {
+  margin-bottom: 2px;
   color: var(--graph-label-muted);
-  font-size: 10px;
+  font-size: calc(var(--vscode-font-size) * 0.85);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+}
+
+.hover-tooltip-item {
+  padding-left: 2px;
+  overflow-wrap: anywhere;
 }
 </style>

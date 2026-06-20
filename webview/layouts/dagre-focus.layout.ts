@@ -9,8 +9,8 @@ import type { RenderNode } from '../types/context.types';
 
 const DAGRE_GRAPH_OPTIONS = {
   rankdir: 'LR',
-  nodesep: 40,
-  ranksep: 80,
+  nodesep: 50,
+  ranksep: 100,
   marginx: 20,
   marginy: 20,
 } as const;
@@ -19,6 +19,18 @@ const NODE_WIDTH = 60;
 const NODE_HEIGHT = 24;
 const COMPONENT_GAP = 40;
 const DEFAULT_NODE_SIZE = 8;
+
+function visibleLabelFromFilePath(filePath: string): string {
+  const segments = filePath.split(/[/\\]/);
+  const basename = segments[segments.length - 1] ?? filePath;
+  const extensionIndex = basename.lastIndexOf('.');
+
+  if (extensionIndex <= 0) {
+    return basename;
+  }
+
+  return basename.slice(0, extensionIndex);
+}
 
 type LayoutPosition = {
   x: number;
@@ -55,7 +67,8 @@ export function layoutWithDagre(projection: ContextProjection): RenderNode[] {
 
     return {
       id: node.filePath,
-      label: node.title,
+      label: visibleLabelFromFilePath(node.filePath),
+      title: node.title,
       x: position.x,
       y: position.y,
       size: DEFAULT_NODE_SIZE,

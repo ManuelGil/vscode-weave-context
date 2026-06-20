@@ -11,10 +11,16 @@ import type {
   RendererInteraction,
 } from '../types/context.types';
 
-const MAX_VISIBLE_LABEL_LENGTH = 22;
+const MAX_VISIBLE_LABEL_LENGTH = 28;
+const PROGRESSIVE_LABEL_THRESHOLD = 6;
 const UNIFIED_NODE_SIZE = 8;
-const FOCUS_NODE_SIZE = 10;
+const FOCUS_NODE_SIZE = 13;
 const HIGHLIGHTED_NODE_SIZE = 12;
+const FOCUS_BORDER_SIZE = 2;
+const ACTIVE_EDGE_SIZE = 2.5;
+const DIMMED_EDGE_SIZE = 1;
+const DEFAULT_EDGE_SIZE = 1.5;
+const LABEL_OFFSET_Y = 4;
 
 let themeColorProbe: HTMLDivElement | undefined;
 
@@ -42,7 +48,23 @@ const cssVar = (name: string): string => {
   const color = getComputedStyle(themeColorProbe).color;
   themeColorProbe.style.color = '';
 
-  return color || '#cccccc';
+  return color || cssVar('--vscode-foreground');
+};
+
+const withAlpha = (color: string, alpha: number): string => {
+  const match = color.match(/rgba?\(([^)]+)\)/);
+
+  if (!match) {
+    return color;
+  }
+
+  const parts = match[1].split(',').map((part) => part.trim());
+
+  if (parts.length < 3) {
+    return color;
+  }
+
+  return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})`;
 };
 
 const truncateLabel = (
@@ -56,6 +78,84 @@ const truncateLabel = (
   }
 
   return `${trimmed.slice(0, maxLength - 1)}…`;
+};
+
+const isFocusNeighbor = (
+  nodeId: string,
+  focusId: string,
+  edges: ContextEdge[],
+): boolean => {
+  return edges.some((edge) => {
+    if (!edge.targetFilePath) {
+      return false;
+    }
+
+    return (
+      (edge.sourceFilePath === focusId && edge.targetFilePath === nodeId) ||
+      (edge.targetFilePath === focusId && edge.sourceFilePath === nodeId)
+    );
+  });
+};
+
+const shouldShowNodeLabel = (
+  nodeId: string,
+  nodes: RenderNode[],
+  edges: ContextEdge[],
+  hoveredNodeId: string | null,
+): boolean => {
+  if (nodes.length <= PROGRESSIVE_LABEL_THRESHOLD) {
+    return true;
+  }
+
+  const focusNode = nodes.find((node) => node.role === 'focus');
+
+  if (!focusNode) {
+    return true;
+  }
+
+  if (nodeId === focusNode.id || isFocusNeighbor(nodeId, focusNode.id, edges)) {
+    return true;
+  }
+
+  return hoveredNodeId === nodeId;
+};
+
+const drawNodeLabelBelow = (
+  context: CanvasRenderingContext2D,
+  data: {
+    x: number;
+    y: number;
+    size: number;
+    label?: string | null;
+    labelColor?: string;
+  },
+  settings: {
+    labelSize: number;
+    labelFont: string;
+    labelWeight: string;
+    labelColor: { attribute?: string; color?: string };
+  },
+): void => {
+  if (!data.label) {
+    return;
+  }
+
+  const fontSize = settings.labelSize;
+  const font = settings.labelFont;
+  const weight = settings.labelWeight;
+  const color =
+    data.labelColor ??
+    (settings.labelColor.attribute
+      ? cssVar('--graph-label-color')
+      : settings.labelColor.color ?? cssVar('--graph-label-color'));
+
+  context.fillStyle = color;
+  context.font = `${weight} ${fontSize}px ${font}`;
+  context.textAlign = 'center';
+  context.textBaseline = 'top';
+  context.fillText(data.label, data.x, data.y + data.size + LABEL_OFFSET_Y);
+  context.textAlign = 'left';
+  context.textBaseline = 'alphabetic';
 };
 
 export type ContextRenderer = {
@@ -131,43 +231,65 @@ export function createContextRenderer(): ContextRenderer {
     return false;
   };
 
+  const hasActiveInteraction = (): boolean => {
+    return Boolean(
+      interaction.hoveredNodeId || interaction.selectedNodeId,
+    );
+  };
+
   const applyNodeReducer = (node: string, data: Record<string, unknown>) => {
     const renderNode = latestNodes.find((entry) => entry.id === node);
     const role = renderNode?.role ?? 'outgoing';
+    const isSelected = interaction.selectedNodeId === node;
+    const isHovered = interaction.hoveredNodeId === node;
     const isHighlighted =
-      interaction.selectedNodeId === node ||
-      interaction.hoveredNodeId === node ||
+      isSelected ||
+      isHovered ||
       isNodeConnectedToSelection(node);
     const isFocus = role === 'focus';
     const rawLabel = renderNode?.label ?? '';
+    const showLabel = shouldShowNodeLabel(
+      node,
+      latestNodes,
+      latestEdges,
+      interaction.hoveredNodeId,
+    );
 
     let size = UNIFIED_NODE_SIZE;
     if (isFocus) {
       size = FOCUS_NODE_SIZE;
     }
-    if (isHighlighted) {
+    if (isHighlighted && !isFocus) {
       size = HIGHLIGHTED_NODE_SIZE;
     }
 
-    let nodeColor = cssVar('--graph-node-outgoing-color');
-    let borderColor = cssVar('--graph-node-outgoing-border');
+    let nodeColor = cssVar('--graph-node-default-color');
+    let borderColor = cssVar('--graph-node-default-border');
     let borderSize = 0.8;
-
-    if (role === 'backlink') {
-      nodeColor = cssVar('--graph-node-backlink-color');
-      borderColor = cssVar('--graph-node-backlink-border');
-    }
 
     if (isFocus) {
       nodeColor = cssVar('--graph-node-focus-color');
       borderColor = cssVar('--graph-node-focus-border');
-      borderSize = 1.2;
+      borderSize = FOCUS_BORDER_SIZE;
     }
 
-    if (isHighlighted) {
+    if (isHighlighted && !isFocus) {
       nodeColor = cssVar('--graph-node-highlight');
       borderColor = cssVar('--graph-node-highlight');
       borderSize = 1.4;
+    }
+
+    if (isHighlighted && isFocus) {
+      borderSize = FOCUS_BORDER_SIZE + 0.4;
+    }
+
+    let zIndex = 0;
+    if (isFocus && isSelected) {
+      zIndex = 3;
+    } else if (isHighlighted) {
+      zIndex = 2;
+    } else if (isFocus) {
+      zIndex = 1;
     }
 
     return {
@@ -176,9 +298,11 @@ export function createContextRenderer(): ContextRenderer {
       borderColor,
       borderSize,
       size,
-      label: truncateLabel(rawLabel, isFocus ? 28 : MAX_VISIBLE_LABEL_LENGTH),
+      label: showLabel
+        ? truncateLabel(rawLabel, MAX_VISIBLE_LABEL_LENGTH)
+        : '',
       labelColor: cssVar('--graph-label-color'),
-      zIndex: isHighlighted ? 2 : isFocus ? 1 : 0,
+      zIndex,
     };
   };
 
@@ -190,16 +314,32 @@ export function createContextRenderer(): ContextRenderer {
     const source = graph.source(edge);
     const target = graph.target(edge);
     const highlighted = isEdgeHighlighted(source, target);
+    const activeInteraction = hasActiveInteraction();
 
-    const edgeColor = cssVar(
-      highlighted ? '--graph-edge-highlight' : '--graph-edge-color',
-    );
+    let edgeColor = cssVar('--graph-edge-color');
+    let edgeSize = DEFAULT_EDGE_SIZE;
+    let edgeZIndex = 0;
+
+    if (activeInteraction) {
+      if (highlighted) {
+        edgeColor = withAlpha(cssVar('--graph-edge-highlight'), 1);
+        edgeSize = ACTIVE_EDGE_SIZE;
+        edgeZIndex = 1;
+      } else {
+        edgeColor = cssVar('--graph-edge-dimmed');
+        edgeSize = DIMMED_EDGE_SIZE;
+      }
+    } else if (highlighted) {
+      edgeColor = cssVar('--graph-edge-highlight');
+      edgeSize = ACTIVE_EDGE_SIZE;
+      edgeZIndex = 1;
+    }
 
     return {
       ...data,
       color: edgeColor,
-      size: highlighted ? 3 : 2,
-      zIndex: highlighted ? 1 : 0,
+      size: edgeSize,
+      zIndex: edgeZIndex,
     };
   };
 
@@ -209,7 +349,7 @@ export function createContextRenderer(): ContextRenderer {
     }
 
     const nextIds = new Set(nodes.map((node) => node.id));
-    const defaultNodeColor = cssVar('--graph-node-outgoing-color');
+    const defaultNodeColor = cssVar('--graph-node-default-color');
 
     for (const existingId of graph.nodes()) {
       if (!nextIds.has(existingId)) {
@@ -281,7 +421,9 @@ export function createContextRenderer(): ContextRenderer {
       labelFont: 'var(--vscode-font-family)',
       labelSize: 11,
       labelWeight: '600',
-      minEdgeThickness: 2,
+      labelColor: { attribute: 'labelColor' },
+      defaultDrawNodeLabel: drawNodeLabelBelow,
+      minEdgeThickness: 1,
       minCameraRatio: 0.04,
       maxCameraRatio: 4,
     });
@@ -370,7 +512,9 @@ export function getNodeConnectionDetails(
   edges: ContextEdge[],
 ): Omit<HoverDetails, 'x' | 'y'> {
   const titleForNodeId = (id: string): string => {
-    return nodes.find((node) => node.id === id)?.label ?? id;
+    const node = nodes.find((entry) => entry.id === id);
+
+    return node?.title ?? node?.label ?? id;
   };
 
   const incoming = new Set<string>();

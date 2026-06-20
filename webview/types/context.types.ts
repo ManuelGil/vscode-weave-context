@@ -6,7 +6,10 @@ import type {
 /** Node with layout coordinates ready for Graphology / Sigma. */
 export type RenderNode = {
   id: string;
+  /** Short visible label (filename stem). */
   label: string;
+  /** Full note title for tooltip and future panels. */
+  title: string;
   x: number;
   y: number;
   size: number;

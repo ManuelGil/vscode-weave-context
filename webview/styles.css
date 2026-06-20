@@ -12,31 +12,36 @@ body,
   font-size: var(--vscode-font-size);
 
   /* Graph visual properties derived from VSCode theme */
-  --graph-node-focus-color: var(--vscode-foreground);
-  --graph-node-backlink-color: color-mix(
+  --graph-node-default-color: color-mix(
     in srgb,
-    var(--vscode-foreground) 70%,
+    var(--vscode-foreground) 82%,
     transparent
   );
-  --graph-node-outgoing-color: color-mix(
+  --graph-node-default-border: color-mix(
     in srgb,
-    var(--vscode-foreground) 88%,
+    var(--vscode-foreground) 55%,
     transparent
   );
-  --graph-node-highlight: var(--vscode-textLink-activeForeground);
-  --graph-node-backlink-border: var(--vscode-charts-orange, #ce9178);
-  --graph-node-outgoing-border: var(--vscode-charts-blue, #75beff);
+  --graph-node-focus-color: var(--vscode-textLink-foreground);
   --graph-node-focus-border: var(
     --vscode-focusBorder,
-    var(--vscode-foreground)
+    var(--vscode-textLink-foreground)
   );
+  --graph-node-highlight: var(--vscode-textLink-activeForeground);
   --graph-edge-color: color-mix(
     in srgb,
-    var(--vscode-foreground) 50%,
+    var(--vscode-foreground) 35%,
     transparent
   );
   --graph-edge-highlight: var(--vscode-textLink-activeForeground);
+  --graph-edge-dimmed: color-mix(
+    in srgb,
+    var(--vscode-foreground) 12%,
+    transparent
+  );
   --graph-label-color: var(--vscode-foreground);
   --graph-label-muted: var(--vscode-descriptionForeground);
-  --graph-empty-message: var(--vscode-descriptionForeground);
+  --graph-tooltip-background: var(--vscode-editorWidget-background);
+  --graph-tooltip-border: var(--vscode-editorWidget-border);
+  --graph-tooltip-shadow: var(--vscode-widget-shadow);
 }
