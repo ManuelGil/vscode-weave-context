@@ -6,7 +6,7 @@
 
 > Navigate your notes like code.
 
-![Workspace Explorer, Wikilinks, Hover Navigation and Context View](https://raw.githubusercontent.com/ManuelGil/vscode-astro-generator/main/assets/images/weave-context-overview.png)
+![Workspace Explorer, Wikilinks, Hover Navigation and Context View](https://raw.githubusercontent.com/ManuelGil/vscode-weave-context/main/assets/images/weave-context-overview.png)
 
 Weave Context brings native navigation workflows to Markdown inside VS Code.
 
