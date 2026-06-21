@@ -22,6 +22,81 @@ const DIMMED_EDGE_SIZE = 1;
 const DEFAULT_EDGE_SIZE = 1.5;
 const LABEL_OFFSET_Y = 4;
 
+const DEPTH_OPACITY: Record<number, number> = {
+  0: 1,
+  1: 0.9,
+  2: 0.7,
+  3: 0.5,
+};
+
+const depthOpacity = (depth: number): number => {
+  return DEPTH_OPACITY[depth] ?? DEPTH_OPACITY[3];
+};
+
+const buildDepthMap = (
+  nodes: RenderNode[],
+  edges: ContextEdge[],
+): Map<string, number> => {
+  const focusNode = nodes.find((node) => node.role === 'focus');
+
+  if (!focusNode) {
+    return new Map(nodes.map((node) => [node.id, 0]));
+  }
+
+  const adjacency = new Map<string, Set<string>>();
+
+  for (const node of nodes) {
+    adjacency.set(node.id, new Set());
+  }
+
+  for (const edge of edges) {
+    if (!edge.targetFilePath) {
+      continue;
+    }
+
+    adjacency.get(edge.sourceFilePath)?.add(edge.targetFilePath);
+    adjacency.get(edge.targetFilePath)?.add(edge.sourceFilePath);
+  }
+
+  const depths = new Map<string, number>();
+  const queue = [focusNode.id];
+
+  depths.set(focusNode.id, 0);
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    const currentDepth = depths.get(currentId)!;
+
+    for (const neighborId of adjacency.get(currentId) ?? []) {
+      if (depths.has(neighborId)) {
+        continue;
+      }
+
+      depths.set(neighborId, currentDepth + 1);
+      queue.push(neighborId);
+    }
+  }
+
+  for (const node of nodes) {
+    if (!depths.has(node.id)) {
+      depths.set(node.id, 3);
+    }
+  }
+
+  return depths;
+};
+
+const edgeDepthOpacity = (
+  sourceId: string,
+  targetId: string,
+  depthMap: Map<string, number>,
+): number => {
+  const sourceDepth = depthMap.get(sourceId) ?? 3;
+  const targetDepth = depthMap.get(targetId) ?? 3;
+
+  return Math.min(depthOpacity(sourceDepth), depthOpacity(targetDepth));
+};
+
 let themeColorProbe: HTMLDivElement | undefined;
 
 /** Resolves a theme CSS variable to a computed color Sigma can render. */
@@ -176,6 +251,7 @@ export function createContextRenderer(): ContextRenderer {
   let renderer: Sigma | undefined;
   let latestNodes: RenderNode[] = [];
   let latestEdges: ContextEdge[] = [];
+  let nodeDepthMap = new Map<string, number>();
   let interaction: RendererInteraction = {
     hoveredNodeId: null,
     selectedNodeId: null,
@@ -283,6 +359,13 @@ export function createContextRenderer(): ContextRenderer {
       borderSize = FOCUS_BORDER_SIZE + 0.4;
     }
 
+    const nodeDepth = nodeDepthMap.get(node) ?? 3;
+    const depthAlpha = depthOpacity(nodeDepth);
+    const visualAlpha = isHighlighted ? Math.max(depthAlpha, 0.95) : depthAlpha;
+
+    nodeColor = withAlpha(nodeColor, visualAlpha);
+    borderColor = withAlpha(borderColor, visualAlpha);
+
     let zIndex = 0;
     if (isFocus && isSelected) {
       zIndex = 3;
@@ -301,7 +384,7 @@ export function createContextRenderer(): ContextRenderer {
       label: showLabel
         ? truncateLabel(rawLabel, MAX_VISIBLE_LABEL_LENGTH)
         : '',
-      labelColor: cssVar('--graph-label-color'),
+      labelColor: withAlpha(cssVar('--graph-label-color'), visualAlpha),
       zIndex,
     };
   };
@@ -315,8 +398,9 @@ export function createContextRenderer(): ContextRenderer {
     const target = graph.target(edge);
     const highlighted = isEdgeHighlighted(source, target);
     const activeInteraction = hasActiveInteraction();
+    const edgeAlpha = edgeDepthOpacity(source, target, nodeDepthMap);
 
-    let edgeColor = cssVar('--graph-edge-color');
+    let edgeColor = withAlpha(cssVar('--graph-edge-color'), edgeAlpha);
     let edgeSize = DEFAULT_EDGE_SIZE;
     let edgeZIndex = 0;
 
@@ -326,11 +410,17 @@ export function createContextRenderer(): ContextRenderer {
         edgeSize = ACTIVE_EDGE_SIZE;
         edgeZIndex = 1;
       } else {
-        edgeColor = cssVar('--graph-edge-dimmed');
+        edgeColor = withAlpha(
+          cssVar('--graph-edge-dimmed'),
+          Math.min(edgeAlpha, 0.35),
+        );
         edgeSize = DIMMED_EDGE_SIZE;
       }
     } else if (highlighted) {
-      edgeColor = cssVar('--graph-edge-highlight');
+      edgeColor = withAlpha(
+        cssVar('--graph-edge-highlight'),
+        Math.max(edgeAlpha, 0.95),
+      );
       edgeSize = ACTIVE_EDGE_SIZE;
       edgeZIndex = 1;
     }
@@ -479,6 +569,7 @@ export function createContextRenderer(): ContextRenderer {
     syncPayload(payload) {
       latestNodes = payload.nodes;
       latestEdges = payload.edges;
+      nodeDepthMap = buildDepthMap(latestNodes, latestEdges);
       syncGraphNodes(latestNodes);
       graph?.clearEdges();
       addRenderableEdges(latestEdges);
@@ -500,6 +591,7 @@ export function createContextRenderer(): ContextRenderer {
       renderer = undefined;
       latestNodes = [];
       latestEdges = [];
+      nodeDepthMap = new Map();
       themeColorProbe?.remove();
       themeColorProbe = undefined;
     },

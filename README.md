@@ -4,18 +4,28 @@
 [![GitHub Repo Stars](https://img.shields.io/github/stars/ManuelGil/vscode-weave-context?style=for-the-badge&logo=github)](https://github.com/ManuelGil/vscode-weave-context)
 [![GitHub License](https://img.shields.io/github/license/ManuelGil/vscode-weave-context?style=for-the-badge&logo=github)](https://github.com/ManuelGil/vscode-weave-context/blob/main/LICENSE)
 
-> Navigate your notes like code
+> Navigate your notes like code.
 
-Weave Context brings native semantic navigation to markdown inside VS Code.
+![Workspace Explorer, Wikilinks, Hover Navigation and Context View](https://raw.githubusercontent.com/ManuelGil/vscode-astro-generator/main/assets/images/weave-context-overview.png)
 
-Instead of treating notes as isolated documents, Weave Context treats markdown references like editor symbols:
+Weave Context brings native navigation workflows to Markdown inside VS Code.
 
-- Ctrl+Click to navigate between ideas
-- Rename semantic references safely
-- Find references across notes
-- Autocomplete wikilinks with canonical identities
+It helps you build and maintain connected documentation using the same workflows developers already use for source code.
 
-Your context becomes navigable using the same workflows developers already use for code.
+Instead of treating notes as isolated documents, Weave Context treats Markdown references as navigable editor symbols.
+
+That means you can:
+
+- Go to Definition
+- Find References
+- Rename Symbol
+- Autocomplete wikilinks
+
+across connected notes.
+
+Your notes remain plain Markdown files.
+
+Your context becomes navigable.
 
 ## Why
 
@@ -23,88 +33,186 @@ Code evolves quickly.
 
 Context usually does not.
 
-Architecture decisions, debugging trails, implementation details, trade-offs, and reasoning often become fragmented across:
+Architecture decisions, implementation details, debugging trails, trade-offs, and reasoning become scattered across:
 
 - markdown notes
-- temporary documentation
+- documentation
 - pull requests
 - comments
 - memory
 
 Eventually the problem becomes:
 
-> “Where did I see this?”
+> Where did I see this?
 
-Weave Context helps recover and navigate context directly inside the editor.
+Weave Context helps recover and navigate that context directly inside VS Code.
 
 ## What Makes It Different
 
-Most markdown knowledge tools focus on:
+Most Markdown tools focus on:
 
-- graphs
 - note management
 - workspace organization
+- global graph views
+- knowledge management workflows
 
 Weave Context focuses on:
 
 ```text
-semantic editor navigation
+navigation and maintenance
 ```
 
-Markdown references behave like native editor primitives.
+Markdown references behave like editor primitives.
 
-That means:
+This enables:
 
 - Go to Definition for notes
-- Find References across markdown
-- Rename continuity for wikilinks
-- Deterministic semantic navigation
+- Find References across Markdown
+- Rename-safe link maintenance
+- Documentation continuity as notes evolve
+- Deterministic navigation
 - Filesystem-backed identity
 
-## Semantic Wikilinks
+## Mental Model
 
-Weave Context supports semantic wikilinks with canonical navigation behavior.
+Weave Context is built around a small set of principles.
 
-```md
-[[login-flow]]
+### Notes are files
 
-[[login-flow|Login Flow]]
+Files are the source of identity.
 
-[[Login Flow]]
-```
+A note is identified by its location in the filesystem.
 
-All forms can:
+Not by:
 
-- navigate
-- rename
-- resolve references
-- participate in semantic completion
+- hidden IDs
+- database records
+- proprietary identifiers
 
-while preserving deterministic canonical identity.
+### Wikilinks create relationships
 
-## Native Editor Workflows
-
-Weave Context integrates directly into native VS Code workflows.
-
-### Go to Definition
-
-Ctrl+Click or F12 on a wikilink:
+Relationships are created explicitly:
 
 ```md
 [[token-expiration]]
 ```
 
-Jump directly to the referenced note.
+No relationship exists unless a reference exists.
+
+### Relationships come from references
+
+Weave Context does not infer connections.
+
+It does not use:
+
+- embeddings
+- AI inference
+- similarity matching
+- shared tags
+- co-occurrence analysis
+
+Relationships come only from explicit references.
+
+### Aliases help resolution
+
+Aliases provide alternate entry points for navigation.
+
+They do not create new notes.
+
+They do not create new relationships.
+
+They simply help multiple names resolve to the same destination.
+
+### Navigation and maintenance share the same model
+
+The same identity model powers:
+
+- navigation
+- references
+- rename
+- completion
+- visualization
+
+There are no parallel semantic systems.
+
+Everything builds on the same reference model.
+
+## Filesystem-Backed Identity
+
+Weave Context uses the filesystem as the canonical identity layer.
+
+This makes navigation:
+
+- deterministic
+- portable
+- inspectable
+- repository-friendly
+
+No hidden databases are required.
+
+No proprietary file formats are required.
+
+Markdown remains standard Markdown.
+
+## Philosophy
+
+Weave Context is not:
+
+- a PKM system
+- a workflow engine
+- a knowledge graph
+- an AI workspace
+- a second brain
+
+Weave Context is:
+
+```text
+a navigation layer for connected documentation
+```
+
+The goal is simple:
+
+```text
+Context should be navigable like code.
+```
+
+## Navigation Workflows
+
+Weave Context integrates directly into native VS Code workflows.
+
+### Go to Definition
+
+Use:
+
+```text
+Ctrl+Click
+```
+
+or
+
+```text
+F12
+```
+
+on a wikilink:
+
+```md
+[[token-expiration]]
+```
+
+to jump directly to the referenced note.
 
 ### Find References
 
-Use native references navigation:
+Use:
 
 ```text
-Shift + F12
+Shift+F12
 ```
 
-to discover semantic references across markdown notes.
+to discover every reference to a note across your workspace.
+
+This makes Markdown navigation behave more like source code navigation.
 
 ### Rename Symbol
 
@@ -114,9 +222,13 @@ Use:
 F2
 ```
 
-to safely rename semantic references across the workspace while preserving aliases and navigation continuity.
+to safely rename references across the workspace.
 
-### Semantic Completion
+Weave Context updates connected wikilinks while preserving navigation continuity.
+
+This allows documentation structures to evolve without breaking references.
+
+### Completion
 
 Start typing:
 
@@ -124,34 +236,67 @@ Start typing:
 [[
 ```
 
-to autocomplete semantic note references using canonical identities and aliases.
+to receive completion suggestions from:
 
-### Insert canonical wikilinks
+- notes
+- aliases
 
-Use the command palette entry:
+Multiple names can resolve to the same note while preserving deterministic navigation.
+
+### Insert Wikilinks
+
+Use:
 
 ```text
 Weave Context: Insert note link
 ```
 
-to pick any note and insert a deterministic `[[slug]]` wikilink (or `[[slug|Title]]` when the note title differs from the canonical slug) at all active cursor locations.
+from the Command Palette.
 
-## Filesystem-Backed Identity
+Select a note and insert a wikilink at every active cursor location.
 
-Weave Context uses the filesystem as the canonical semantic identity layer.
+Examples:
 
-This keeps references:
+```md
+[[login-flow]]
+```
 
-- deterministic
-- portable
-- inspectable
-- compatible with standard markdown workflows
+or
 
-No hidden databases or proprietary note formats are required.
+```md
+[[login-flow|Login Flow]]
+```
 
-## Semantic Frontmatter
+depending on the note configuration.
 
-Weave Context supports lightweight semantic frontmatter for navigation-oriented metadata.
+## Wikilinks
+
+Weave Context supports multiple forms of navigation-friendly wikilinks.
+
+```md
+[[login-flow]]
+
+[[login-flow|Login Flow]]
+
+[[Login Flow]]
+```
+
+All forms participate in:
+
+- navigation
+- references
+- rename
+- completion
+
+while resolving to the same note.
+
+## Frontmatter
+
+Frontmatter is optional.
+
+It exists to improve navigation and readability.
+
+Example:
 
 ```yaml
 ---
@@ -160,22 +305,30 @@ title: Login Flow
 aliases:
   - Login Process
   - Authentication Flow
-
-status: draft
 ---
 ```
 
-Frontmatter remains:
+Weave Context does not treat Markdown as a database.
 
-- optional
-- portable
-- filesystem-friendly
+Metadata remains lightweight and portable.
 
-Weave Context does not use markdown as a database or workflow engine.
+### Title
+
+`title` provides a human-readable representation of a note.
+
+It improves:
+
+- labels
+- previews
+- navigation surfaces
+
+Titles do not define identity.
+
+Filesystem identity remains authoritative.
 
 ### Aliases
 
-Aliases provide alternate semantic entry points for navigation.
+Aliases provide alternate navigation entry points.
 
 Example:
 
@@ -183,7 +336,7 @@ Example:
 [[Login Process]]
 ```
 
-can resolve to the same canonical note as:
+can resolve to the same note as:
 
 ```md
 [[login-flow]]
@@ -191,182 +344,78 @@ can resolve to the same canonical note as:
 
 Aliases:
 
-- preserve semantic continuity
-- support human-oriented naming
-- remain compatible with deterministic navigation
+- improve discoverability
+- support natural naming
+- preserve navigation continuity
+- resolve to the same underlying note
 
-Canonical filesystem identity always remains primary.
+They do not create additional notes or relationships.
 
-### Status
+## Context View
 
-`status` provides lightweight navigation confidence metadata.
+Weave Context also includes a local context visualization.
 
-Examples:
+The Context View is not a global knowledge graph.
 
-```yaml
-status: draft
-status: stable
-status: deprecated
-status: hypothesis
-```
-
-Status metadata is:
-
-- informational
-- optional
-- lightweight
-
-It does not affect:
-
-- canonical identity
-- semantic resolution
-- navigation targeting
-
-## Semantic Workspace Index
-
-Weave Context includes a lightweight semantic workspace explorer integrated into the VS Code sidebar.
-
-The workspace index is derived from:
-
-- the configured notes root (`weaveContext.notesRoot`, default `.context/notes`)
-- normalized semantic frontmatter
-
-It is designed for:
-
-- fast orientation
-- lightweight navigation
-- semantic workspace visibility
-
-Tree grouping uses one active projection at a time (`weaveContext.treeProjection`):
-
-- filesystem
-- category
-- tags
-- project
-
-NOT:
-
-- graph traversal
-- workflow management
-- metadata dashboards
-
-## Philosophy
-
-Weave Context is built around a simple principle:
-
-```text
-Context should be navigable like code.
-```
-
-The goal is not to create another knowledge management system.
-
-The goal is to reduce the cognitive friction of recovering context while working.
-
-## Design Principles
-
-### Native editor behavior first
-
-Weave Context prioritizes:
-
-- Go to Definition
-- Find References
-- Rename Symbol
-- semantic completion
-
-over custom navigation systems.
-
-### Deterministic semantics
-
-Semantic navigation must remain:
-
-- predictable
-- inspectable
-- filesystem-backed
-
-No hidden semantic layers or opaque indexing systems are required.
-
-### Lightweight metadata
-
-Metadata exists only if it strengthens semantic navigation.
-
-Weave Context intentionally avoids:
-
-- workflow systems
-- complex schemas
-- metadata engines
-- organizational overhead
-
-### Portable markdown
-
-Markdown files remain:
-
-- readable
-- portable
-- repository-friendly
-- editor-independent
-
-Weave Context enhances markdown navigation without locking notes into proprietary formats.
-
-## Visualization & Context Exploration
-
-Weave Context is evolving toward richer context exploration capabilities, including:
-
-- semantic visualization
-- contextual navigation views
-- graph-based exploration
-- semantic workspace discovery
-
-These capabilities are designed to extend the same deterministic semantic primitives already used by:
+Its purpose is to visualize the immediate context around a note using the same reference model that powers:
 
 - navigation
 - references
-- rename continuity
-- semantic completion
+- rename
+- completion
 
-The semantic model remains primary.
-Visualization is derived from it - not the other way around.
+The graph is derived entirely from explicit wikilinks.
 
-## Example
+Every visible connection corresponds to a real reference in your notes.
 
-```text
-notes/
-  auth/
-    login-flow.md
-    token-expiration.md
-```
+No inferred relationships are introduced.
 
-```md
-# login-flow.md
+Visualization is a consumer of the navigation model, never its authority.
 
-[[token-expiration]]
-[[Login Process]]
-```
+## Workspace Explorer
 
-Navigate between related ideas using native editor workflows:
+Weave Context includes a lightweight navigation-oriented explorer integrated into the VS Code sidebar.
 
-- Ctrl+Click
-- F12
-- Shift+F12
-- F2
-- semantic completion
+The explorer helps you navigate notes using lightweight workspace projections.
+
+Its purpose is:
+
+- orientation
+- discovery
+- navigation
+
+Not:
+
+- workflow management
+- dashboards
+- graph analysis
+
+Available projections:
+
+| Projection | Purpose                   |
+| ---------- | ------------------------- |
+| filesystem | Physical structure        |
+| category   | Reasoning domains         |
+| tags       | Lightweight grouping      |
+| project    | Project-scoped navigation |
+
+Projections are deterministic and derived from your notes and metadata.
 
 ## Installation
 
-Install **Weave Context** from the VS Code Marketplace:
+Install **Weave Context** from the VS Code Marketplace.
+
+Search:
 
 ```text
-Extensions → Search: Weave Context
+Weave Context
 ```
 
-or install directly from the Marketplace page:
-
-```text
-https://marketplace.visualstudio.com/items?itemName=imgildev.vscode-weave-context
-```
+inside the Extensions view.
 
 ## Getting Started
 
-Create markdown notes anywhere inside your workspace:
+Create Markdown notes anywhere in your workspace:
 
 ```text
 notes/
@@ -375,7 +424,7 @@ notes/
     token-expiration.md
 ```
 
-Add semantic wikilinks:
+Add references:
 
 ```md
 [[token-expiration]]
@@ -388,118 +437,38 @@ Then use native editor workflows:
 - Shift+F12
 - F2
 
-to navigate semantic context directly inside VS Code.
+to navigate and maintain connected documentation directly inside VS Code.
 
-## Recommended Structure
+## Design Principles
 
-Weave Context works with standard markdown files and does not require a rigid workspace structure.
+### Native editor workflows first
 
-Example:
+Navigation should feel like working with code.
 
-```text
-notes/
-  architecture/
-  debugging/
-  decisions/
-  auth/
-```
+### Deterministic behavior
 
-Filesystem organization remains fully user-controlled.
+Identity and resolution must remain predictable and inspectable.
 
-## Current Capabilities
+### Lightweight metadata
 
-### Semantic navigation
+Metadata should support navigation, not become a management system.
 
-- Go to Definition for wikilinks
-- Find References across markdown
-- Semantic rename continuity
-- Deterministic semantic resolution
+### Portable Markdown
 
-## TreeView - Semantic Projections
-
-Weave Context provides a TreeView that surfaces a semantic perspective over the workspace. It is a lightweight projection layer over portable markdown and NOT a graph or metadata engine.
-
-- **One active projection at a time:** set via workspace configuration `weaveContext.treeProjection`.
-- **Projections:**
-
-| Projection | Purpose                       |
-| ---------- | ----------------------------- |
-| filesystem | physical workspace structure  |
-| category   | reasoning domains             |
-| tags       | lightweight semantic grouping |
-| project    | project-scoped navigation     |
-
-Behavior notes:
-
-- Projections consume only normalized semantic frontmatter (canonical model).
-- Projections are flat and deterministic - no nested hierarchies or graph reconstruction.
-- Notes without the active projection metadata still appear under a graceful fallback group (for example, notes without a `category` appear under “General Context”).
-
-Example frontmatter accepted by projections:
-
-```yaml
----
-title: Login Flow
-category: architecture
-status: draft
-aliases:
-  - Login Flow
-tags:
-  - auth
-  - session
----
-```
-
-Labels in the TreeView use `title` or the file basename. A lightweight suffix such as `(<status>)` may be shown for context only. Clicking a node opens the markdown file using native editor navigation.
-
-The TreeView is intended to help you navigate semantic context inside the editor - it does not manage notes, run workflows, or index metadata.
-
-### Semantic completion
-
-- Wikilink autocomplete
-- Alias-aware suggestions
-- Canonical identity insertion
-
-### Semantic frontmatter
-
-- aliases
-- status
-- normalized semantic metadata
-
-### Semantic workspace indexing
-
-- filesystem-backed note explorer
-- lightweight workspace orientation
-- semantic context visibility
-
-## Roadmap
-
-Planned exploration areas include:
-
-- semantic visualization
-- graph-based context navigation
-- richer workspace exploration
-- contextual semantic search
-- unresolved semantic diagnostics
-
-Future capabilities will continue building on:
-
-- deterministic semantic primitives
-- filesystem-backed identity
-- native editor workflows
+Notes remain readable, repository-friendly, and editor-independent.
 
 ## Philosophy Recap
 
-Weave Context is not trying to replace markdown.
+Weave Context does not try to replace Markdown.
 
-It is not trying to replace your editor.
+It does not try to replace your editor.
 
-It is not trying to become a workflow platform.
+It does not try to become a workflow platform.
 
 The goal is simpler:
 
 ```text
-make context navigable with the same fluency as code
+make connected documentation as navigable and maintainable as code
 ```
 
 ## AI Skills & Contextual Workflows
