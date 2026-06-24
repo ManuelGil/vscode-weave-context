@@ -1,7 +1,4 @@
 import { Position, Range, TextDocument } from 'vscode';
-
-import { basenameFromFsPath } from './path-format.helper';
-
 /**
  * Parses Obsidian-style wiki links:
  *
@@ -15,6 +12,7 @@ import { basenameFromFsPath } from './path-format.helper';
  * {@link ParsedWikiLink.label} is presentational.
  */
 import { ParsedWikiLink, ParsedWikiLinkText, WikiLinkMatch } from '../types';
+import { basenameFromFsPath } from './path-format.helper';
 
 /**
  * Normalizes wikilink references into canonical, lowercase slug-like tokens.

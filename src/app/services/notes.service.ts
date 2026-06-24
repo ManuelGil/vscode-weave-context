@@ -245,7 +245,9 @@ export class NotesService {
   }
 
   /** Returns semantic targets for a note file path (stem + frontmatter aliases). */
-  async getWikiLinkSemanticTargetsForFile(filePath: string): Promise<Set<string>> {
+  async getWikiLinkSemanticTargetsForFile(
+    filePath: string,
+  ): Promise<Set<string>> {
     const canonicalStem = getWikiLinkCanonicalStem(filePath);
     const aliases = await this.getWikiLinkAliases(Uri.file(filePath));
 
@@ -343,7 +345,10 @@ export class NotesService {
 
         for (const hit of hits) {
           if (
-            this.wikilinkTargetMatchesSemanticTargets(hit.target, semanticTargets)
+            this.wikilinkTargetMatchesSemanticTargets(
+              hit.target,
+              semanticTargets,
+            )
           ) {
             references.push({
               sourceFilePath: uri.fsPath,
