@@ -4,15 +4,15 @@
 [![GitHub Repo Stars](https://img.shields.io/github/stars/ManuelGil/vscode-weave-context?style=for-the-badge&logo=github)](https://github.com/ManuelGil/vscode-weave-context)
 [![GitHub License](https://img.shields.io/github/license/ManuelGil/vscode-weave-context?style=for-the-badge&logo=github)](https://github.com/ManuelGil/vscode-weave-context/blob/main/LICENSE)
 
-> Navigate your notes like code.
+> Navigate repository knowledge like code.
 
 ![Workspace Explorer, Wikilinks, Hover Navigation and Context View](https://raw.githubusercontent.com/ManuelGil/vscode-weave-context/main/assets/images/weave-context-overview.png)
 
-Weave Context brings native navigation workflows to Markdown inside VS Code.
+Weave Context is a native VS Code authoring experience for repository-based knowledge.
 
-It helps you build and maintain connected documentation using the same workflows developers already use for source code.
+It is a developer-first, repository-native tool for creating, navigating, and maintaining engineering knowledge alongside source code.
 
-Instead of treating notes as isolated documents, Weave Context treats Markdown references as navigable editor symbols.
+Instead of treating knowledge documents as isolated files, Weave Context treats explicit Markdown references as navigable editor symbols.
 
 That means you can:
 
@@ -21,55 +21,51 @@ That means you can:
 - Rename Symbol
 - Autocomplete wikilinks
 
-across connected notes.
+across connected knowledge documents.
 
-Your notes remain plain Markdown files.
+Your knowledge remains in plain Markdown files.
 
-Your context becomes navigable.
+Your repository knowledge becomes navigable.
 
-## Why
+Knowledge documents can live beside source code, configuration, and project history. Weave Context gives that repository-based knowledge the same deterministic authoring experience developers expect from code.
 
-Code evolves quickly.
+## Repository-Based Knowledge for Developers
 
-Context usually does not.
+Software repositories evolve quickly.
 
-Architecture decisions, implementation details, debugging trails, trade-offs, and reasoning become scattered across:
+The knowledge around them often does not.
 
-- markdown notes
-- documentation
+Source code records how a system works. Repository documentation, maintained as Documentation-as-Code, records why it works that way and how it evolves.
+
+Architecture decisions, implementation documentation, debugging trails, trade-offs, and technical reasoning become scattered across:
+
+- repository documentation
 - pull requests
 - comments
 - memory
 
-Eventually the problem becomes:
+The repository becomes the durable place where this knowledge should be written, linked, and maintained. The problem is finding and evolving it without leaving the editor:
 
 > Where did I see this?
 
-Weave Context helps recover and navigate that context directly inside VS Code.
+Weave Context keeps repository-native knowledge navigable and maintainable directly inside VS Code.
 
 ## What Makes It Different
 
-Most Markdown tools focus on:
-
-- note management
-- workspace organization
-- global graph views
-- knowledge management workflows
-
-Weave Context focuses on:
+Repository knowledge needs more than readable files. It needs:
 
 ```text
 navigation and maintenance
 ```
 
-Markdown references behave like editor primitives.
+Weave Context makes explicit Markdown references behave like editor primitives.
 
 This enables:
 
-- Go to Definition for notes
+- Go to Definition for knowledge documents
 - Find References across Markdown
 - Rename-safe link maintenance
-- Documentation continuity as notes evolve
+- Documentation continuity as knowledge documents evolve
 - Deterministic navigation
 - Filesystem-backed identity
 
@@ -77,11 +73,11 @@ This enables:
 
 Weave Context is built around a small set of principles.
 
-### Notes are files
+### Knowledge lives in ordinary Markdown files
 
 Files are the source of identity.
 
-A note is identified by its location in the filesystem.
+Each knowledge document is identified by its repository path. That path is its canonical identity.
 
 Not by:
 
@@ -117,7 +113,7 @@ Relationships come only from explicit references.
 
 Aliases provide alternate entry points for navigation.
 
-They do not create new notes.
+They do not create new knowledge documents.
 
 They do not create new relationships.
 
@@ -133,7 +129,7 @@ The same identity model powers:
 - completion
 - visualization
 
-There are no parallel semantic systems.
+There are no parallel identity or relationship systems.
 
 Everything builds on the same reference model.
 
@@ -154,11 +150,39 @@ No proprietary file formats are required.
 
 Markdown remains standard Markdown.
 
+The repository remains readable, diffable, portable, and tool-independent.
+
+## Knowledge Repository Root
+
+Repository-based knowledge can be organized in many ways, including OKF-compatible repositories, LLM Wiki repositories, project documentation, or custom Markdown knowledge repositories.
+
+Weave Context works with any configured Knowledge Repository Root. Existing OKF-compatible repositories can be opened directly by configuring `weaveContext.notesRoot`, allowing native VS Code authoring workflows without reorganizing the repository.
+
+Weave Context provides deterministic navigation and documentation continuity within the configured repository root. It does not require or enforce a specific repository format.
+
+The repository is the primary artifact. The folder name is only the boundary Weave Context uses to locate and maintain its Markdown knowledge documents.
+
+The default root is:
+
+```text
+.context/
+```
+
+The root is configurable through `weaveContext.notesRoot`. You can point Weave Context at any repository layout containing Markdown knowledge documents, including:
+
+```text
+.context/      # Weave Context default
+.okf/          # an OKF-compatible repository layout
+.knowledge/    # a custom knowledge repository layout
+docs/          # a project documentation layout
+```
+
 ## Philosophy
 
 Weave Context is not:
 
-- a PKM system
+- a note-taking application
+- a personal knowledge management system
 - a workflow engine
 - a knowledge graph
 - an AI workspace
@@ -167,7 +191,7 @@ Weave Context is not:
 Weave Context is:
 
 ```text
-a navigation layer for connected documentation
+a native authoring, navigation, and continuity layer for repository-based knowledge
 ```
 
 The goal is simple:
@@ -200,7 +224,7 @@ on a wikilink:
 [[token-expiration]]
 ```
 
-to jump directly to the referenced note.
+to jump directly to the referenced knowledge document.
 
 ### Find References
 
@@ -210,7 +234,7 @@ Use:
 Shift+F12
 ```
 
-to discover every reference to a note across your workspace.
+to discover every reference to a knowledge document across your workspace.
 
 This makes Markdown navigation behave more like source code navigation.
 
@@ -238,10 +262,10 @@ Start typing:
 
 to receive completion suggestions from:
 
-- notes
+- knowledge documents
 - aliases
 
-Multiple names can resolve to the same note while preserving deterministic navigation.
+Multiple names can resolve to the same knowledge document while preserving deterministic navigation.
 
 ### Insert Wikilinks
 
@@ -253,7 +277,7 @@ Weave Context: Insert note link
 
 from the Command Palette.
 
-Select a note and insert a wikilink at every active cursor location.
+Select a knowledge document and insert a wikilink at every active cursor location.
 
 Examples:
 
@@ -267,7 +291,7 @@ or
 [[login-flow|Login Flow]]
 ```
 
-depending on the note configuration.
+depending on the document's configuration.
 
 ## Wikilinks
 
@@ -288,19 +312,22 @@ All forms participate in:
 - rename
 - completion
 
-while resolving to the same note.
+while resolving to the same knowledge document.
+
+Wikilinks are the native authoring experience of Weave Context and remain widely used across wiki-based documentation tools. While OKF generally recommends standard Markdown links for interoperability, this is a difference in authoring syntax rather than repository structure. Existing OKF-compatible repositories can be opened by configuring `weaveContext.notesRoot`. Weave Context does not implement or require OKF.
 
 ## Frontmatter
 
 Frontmatter is optional.
 
-It exists to improve navigation and readability.
+It supports navigation and readability; it does not define identity or establish a required repository schema.
 
 Example:
 
 ```yaml
 ---
 title: Login Flow
+type: adr
 
 aliases:
   - Login Process
@@ -314,7 +341,7 @@ Metadata remains lightweight and portable.
 
 ### Title
 
-`title` provides a human-readable representation of a note.
+`title` provides a human-readable representation of a knowledge document.
 
 It improves:
 
@@ -326,9 +353,21 @@ Titles do not define identity.
 
 Filesystem identity remains authoritative.
 
+### Type
+
+`type` is an optional field for classifying a knowledge document, such as `adr`, `guide`, or `runbook`.
+
+It supports:
+
+- filtering
+- categorization
+- projections in the Workspace Explorer
+
+`type` is not required and does not define identity.
+
 ### Aliases
 
-Aliases provide alternate navigation entry points.
+Aliases provide alternate navigation entry points for knowledge documents.
 
 Example:
 
@@ -336,7 +375,7 @@ Example:
 [[Login Process]]
 ```
 
-can resolve to the same note as:
+can resolve to the same knowledge document as:
 
 ```md
 [[login-flow]]
@@ -347,9 +386,9 @@ Aliases:
 - improve discoverability
 - support natural naming
 - preserve navigation continuity
-- resolve to the same underlying note
+- resolve to the same underlying knowledge document
 
-They do not create additional notes or relationships.
+They do not create additional knowledge documents or relationships.
 
 ## Context View
 
@@ -357,7 +396,7 @@ Weave Context also includes a local context visualization.
 
 The Context View is not a global knowledge graph.
 
-Its purpose is to visualize the immediate context around a note using the same reference model that powers:
+Its purpose is to visualize the immediate context around a knowledge document using the same reference model that powers:
 
 - navigation
 - references
@@ -366,7 +405,7 @@ Its purpose is to visualize the immediate context around a note using the same r
 
 The graph is derived entirely from explicit wikilinks.
 
-Every visible connection corresponds to a real reference in your notes.
+Every visible connection corresponds to an explicit reference in your repository.
 
 No inferred relationships are introduced.
 
@@ -376,7 +415,7 @@ Visualization is a consumer of the navigation model, never its authority.
 
 Weave Context includes a lightweight navigation-oriented explorer integrated into the VS Code sidebar.
 
-The explorer helps you navigate notes using lightweight workspace projections.
+The explorer helps you navigate knowledge documents using repository projections.
 
 Its purpose is:
 
@@ -392,14 +431,15 @@ Not:
 
 Available projections:
 
-| Projection | Purpose                   |
-| ---------- | ------------------------- |
-| filesystem | Physical structure        |
-| category   | Reasoning domains         |
-| tags       | Lightweight grouping      |
-| project    | Project-scoped navigation |
+| Projection | Purpose                      |
+| ---------- | ---------------------------- |
+| filesystem | Physical structure           |
+| category   | Declared document categories |
+| type       | Declared document types      |
+| tags       | Lightweight grouping         |
+| project    | Project-scoped navigation    |
 
-Projections are deterministic and derived from your notes and metadata.
+Projections are deterministic and derived from your knowledge documents and metadata.
 
 ## Installation
 
@@ -415,10 +455,10 @@ inside the Extensions view.
 
 ## Getting Started
 
-Create Markdown notes anywhere in your workspace:
+Create or open a Knowledge Repository for engineering documentation alongside your source code. Use the same repository for architecture documentation, ADRs, implementation details, developer guides, and other project knowledge:
 
 ```text
-notes/
+.context/
   auth/
     login-flow.md
     token-expiration.md
@@ -437,7 +477,7 @@ Then use native editor workflows:
 - Shift+F12
 - F2
 
-to navigate and maintain connected documentation directly inside VS Code.
+to navigate and maintain connected repository knowledge directly inside VS Code.
 
 ## Design Principles
 
@@ -455,7 +495,7 @@ Metadata should support navigation, not become a management system.
 
 ### Portable Markdown
 
-Notes remain readable, repository-friendly, and editor-independent.
+Knowledge documents remain readable, diffable, repository-friendly, and editor-independent.
 
 ## Philosophy Recap
 
@@ -468,12 +508,12 @@ It does not try to become a workflow platform.
 The goal is simpler:
 
 ```text
-make connected documentation as navigable and maintainable as code
+make repository-based knowledge as navigable and maintainable as source code
 ```
 
 ## AI Skills & Contextual Workflows
 
-Weave Context works independently as a deterministic semantic navigation layer for markdown inside VS Code.
+Weave Context works independently as a deterministic navigation layer for repository-based Markdown knowledge inside VS Code.
 
 For developers using AI-assisted workflows, optional companion skills are available for tools such as:
 
@@ -482,12 +522,12 @@ For developers using AI-assisted workflows, optional companion skills are availa
 - Copilot
 - Windsurf
 
-These skills help agents better understand:
+Developers and optional AI tools can consume the same repository-based knowledge. These skills help agents follow:
 
-- semantic markdown context
-- implementation relationships
+- explicit Markdown references
+- filesystem-backed document identity
 - workflow continuity
-- and contextual navigation patterns
+- contextual navigation patterns
 
 while preserving the same filesystem-first and deterministic design principles used by Weave Context itself.
 

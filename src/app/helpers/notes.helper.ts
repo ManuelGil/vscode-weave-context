@@ -27,8 +27,9 @@ const normalizeTags = (tags?: string[]): string[] => {
  * Examples:
  *
  * category -> ['Backend']
- * project  -> ['Auth Revamp']
+ * type     -> ['design']
  * tags     -> ['urgent', 'api']
+ * project  -> ['Auth Revamp']
  *
  * Empty values automatically resolve to fallback labels.
  *
@@ -52,6 +53,12 @@ export const resolveProjectionKeys = (
     const project = normalizeString(note.project);
 
     return [project || fallbackLabel];
+  }
+
+  if (projection === 'type') {
+    const type = normalizeString(note.type);
+
+    return [type || fallbackLabel];
   }
 
   if (projection === 'tags') {

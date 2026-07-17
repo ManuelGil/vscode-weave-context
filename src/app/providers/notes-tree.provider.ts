@@ -102,6 +102,7 @@ export class NotesTreeProvider implements TreeDataProvider<NotesTreeNode> {
     const baseOptions: Array<QuickPickItem & { value: TreeProjectionMode }> = [
       { label: l10n.t('Filesystem'), value: 'filesystem' },
       { label: l10n.t('Category'), value: 'category' },
+      { label: l10n.t('Type'), value: 'type' },
       { label: l10n.t('Tags'), value: 'tags' },
       { label: l10n.t('Project'), value: 'project' },
     ];
@@ -162,7 +163,6 @@ export class NotesTreeProvider implements TreeDataProvider<NotesTreeNode> {
             type: 'file',
             uri: Uri.file(note.filePath),
             title: note.title,
-            status: note.status,
           }),
         );
 
@@ -280,20 +280,18 @@ export class NotesTreeProvider implements TreeDataProvider<NotesTreeNode> {
       }
 
       if (type === FileType.File && name.match(/\.md$/i)) {
-        // Derive title/status from frontmatter via NotesService.getNote
+        // Derive title from frontmatter via NotesService.getNote
         let title: string | undefined;
-        let status: string | undefined;
         try {
           const note = await this.notesService.getNote(entryUri);
           if (note) {
             title = note.title;
-            status = note.status;
           }
         } catch {
           // ignore read errors for individual files
         }
 
-        files.push({ type: 'file', uri: entryUri, title, status });
+        files.push({ type: 'file', uri: entryUri, title });
       }
     }
 

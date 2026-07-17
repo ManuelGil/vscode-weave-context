@@ -5,6 +5,7 @@ import {
   languages,
   MarkdownString,
   Position,
+  Range,
   TextDocument,
 } from 'vscode';
 
@@ -17,7 +18,6 @@ import {
   parseWikiLinkAtPosition,
 } from '../helpers';
 import { NotesService } from '../services';
-import type { ParsedWikiLink } from '../types';
 
 const MARKDOWN_SELECTOR = [
   { language: 'markdown' },
@@ -49,31 +49,31 @@ export class MarkdownWikiLinkHoverProvider {
     }
 
     try {
-      const targetUri = await this.notesService.resolveMarkdownWikiLink(
+      const targetUri = await this.notesService.resolveNoteReference(
         wikiLink.target,
       );
 
       if (!targetUri) {
-        return this.buildNotFoundHover(wikiLink);
+        return this.buildNotFoundHover(wikiLink.range);
       }
 
       const note = await this.notesService.getNote(targetUri);
 
       if (!note) {
-        return this.buildNotFoundHover(wikiLink);
+        return this.buildNotFoundHover(wikiLink.range);
       }
 
       const markdown = this.buildNoteHoverMarkdown(note);
       return new Hover(markdown, wikiLink.range);
     } catch {
-      return this.buildNotFoundHover(wikiLink);
+      return this.buildNotFoundHover(wikiLink.range);
     }
   }
 
-  private buildNotFoundHover(match: ParsedWikiLink): Hover {
+  private buildNotFoundHover(range: Range): Hover {
     const markdown = new MarkdownString();
     markdown.appendText(NOT_FOUND_MESSAGE);
-    return new Hover(markdown, match.range);
+    return new Hover(markdown, range);
   }
 
   private buildNoteHoverMarkdown(note: Note): MarkdownString {

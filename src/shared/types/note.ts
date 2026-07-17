@@ -20,7 +20,7 @@ export type NormalizedSemanticFrontmatter = {
   created?: string;
   updated?: string;
   category?: string;
-  status?: string;
+  type?: string;
   project?: string;
   tags?: string[];
   aliases?: string[];
@@ -41,9 +41,9 @@ export interface Note {
   filePath: string;
   tags?: string[];
   aliases?: string[];
-  status?: string;
   summary?: string;
   category?: string;
+  type?: string;
   project?: string;
 }
 

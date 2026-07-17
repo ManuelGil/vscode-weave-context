@@ -1,7 +1,7 @@
 {
 	"weaveContext.enable.description": "Habilitar o deshabilitar la extensión",
-	"weaveContext.notesRoot.description": "Ruta relativa o absoluta usada como raíz canónica de notas para descubrimiento, indexación y navegación.",
-	"weaveContext.treeProjection.description": "Modo único de agrupación activo para el explorador de notas.",
+	"weaveContext.notesRoot.description": "Ruta relativa o absoluta usada como raíz del repositorio de conocimiento para descubrir, indexar y navegar Markdown.",
+	"weaveContext.treeProjection.description": "Modo único de agrupación activo para el explorador del repositorio de conocimiento.",
 	"weaveContext.changeWorkspace.title": "Cambiar carpeta de espacio de trabajo",
 	"weaveContext.treeView.title": "Weave Context",
 	"weaveContext.notesExplorer.title": "Mapa de notas",
@@ -16,5 +16,5 @@
 	"weaveContext.feedback.rateUs": "Valorar extensión",
 	"weaveContext.feedback.supportUs": "Apoyar",
 	"weaveContext.feedbackView": "Comentarios",
-	"viewsWelcome.weaveContext.notesExplorer": "Los archivos Markdown dentro de la raíz de notas configurada aparecen aquí."
+	"viewsWelcome.weaveContext.notesExplorer": "Los documentos de conocimiento Markdown dentro de la raíz configurada del repositorio de conocimiento aparecen aquí."
 }

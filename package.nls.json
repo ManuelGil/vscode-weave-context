@@ -1,7 +1,7 @@
 {
 	"weaveContext.enable.description": "Enable or disable the extension",
-	"weaveContext.notesRoot.description": "Relative or absolute path used as the canonical notes root for discovery, indexing, and navigation.",
-	"weaveContext.treeProjection.description": "Single active grouping mode for the notes explorer.",
+	"weaveContext.notesRoot.description": "Relative or absolute path used as the Knowledge Repository Root for Markdown discovery, indexing, and navigation.",
+	"weaveContext.treeProjection.description": "Single active grouping mode for the Knowledge Repository explorer.",
 	"weaveContext.changeWorkspace.title": "Change workspace folder",
 	"weaveContext.treeView.title": "Weave Context",
 	"weaveContext.notesExplorer.title": "Note Map",
@@ -16,5 +16,5 @@
 	"weaveContext.feedback.rateUs": "Rate Extension",
 	"weaveContext.feedback.supportUs": "Support",
 	"weaveContext.feedbackView": "Feedback",
-	"viewsWelcome.weaveContext.notesExplorer": "Markdown files inside your configured notes root are listed here."
+	"viewsWelcome.weaveContext.notesExplorer": "Markdown knowledge documents inside your configured Knowledge Repository Root are listed here."
 }

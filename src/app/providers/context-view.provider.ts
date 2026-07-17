@@ -300,7 +300,7 @@ export class ContextViewProvider implements WebviewViewProvider, Disposable {
   ): Promise<ContextProjection> {
     const focusFallbackTitle = getWikiLinkCanonicalStem(focusFilePath);
     const focusContent =
-      await this._notesService.readMarkdownContentForWikiLinks(focusFilePath);
+      await this._notesService.readMarkdownContentForReferences(focusFilePath);
 
     if (focusContent === null) {
       return {
@@ -340,7 +340,7 @@ export class ContextViewProvider implements WebviewViewProvider, Disposable {
       targetReference: string,
     ): Promise<string | null> => {
       const targetUri =
-        await this._notesService.resolveMarkdownWikiLink(targetReference);
+        await this._notesService.resolveNoteReference(targetReference);
 
       return targetUri?.fsPath ?? null;
     };
@@ -373,7 +373,7 @@ export class ContextViewProvider implements WebviewViewProvider, Disposable {
     const findBacklinks = async (
       targetPath: string,
     ): Promise<ContextEdge[]> => {
-      const references = await this._notesService.findWikiLinkReferencesTo(
+      const references = await this._notesService.findReferencesTo(
         targetPath,
         operationContext,
       );
@@ -399,7 +399,7 @@ export class ContextViewProvider implements WebviewViewProvider, Disposable {
       }
 
       const content =
-        await this._notesService.readMarkdownContentForWikiLinks(filePath);
+        await this._notesService.readMarkdownContentForReferences(filePath);
 
       if (content === null) {
         return null;

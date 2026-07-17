@@ -1,8 +1,16 @@
 import { Range } from 'vscode';
 
-export type WikiLinkReference = {
-  sourceFilePath: string;
-  targetReference: string;
+import type { ContextEdge } from '../../shared/types/context-projection';
+
+/**
+ * A resolved reference between two notes, narrowed for editor integration.
+ *
+ * Extends the webview-safe {@link ContextEdge} (same domain concept: source note,
+ * target reference, resolved target) with the fields only the extension host needs -
+ * `range` for building a `vscode.Location`, and a required `targetFilePath` since
+ * this shape is only produced once a reference has been resolved.
+ */
+export type WikiLinkReference = ContextEdge & {
   targetFilePath: string;
   range: Range;
 };

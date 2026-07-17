@@ -10,13 +10,19 @@
 		},
 		"weaveContext.notesRoot": {
 			"type": "string",
-			"default": ".context/notes",
+			"default": ".context",
 			"scope": "resource",
-			"description": "Relative or absolute path used as the canonical notes root for discovery, indexing, and navigation."
+			"description": "Relative or absolute path used as the Knowledge Repository Root for Markdown discovery, indexing, and navigation."
 		},
 		"weaveContext.treeProjection": {
 			"type": "string",
-			"enum": ["filesystem", "category", "tags", "project"],
+			"enum": [
+				"filesystem",
+				"category",
+				"type",
+				"tags",
+				"project"
+			],
 			"default": "filesystem",
 			"scope": "resource",
 			"description": "Single active grouping mode for the notes explorer."

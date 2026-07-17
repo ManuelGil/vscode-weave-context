@@ -9,7 +9,7 @@ export const EXTENSION_ID = 'weaveContext';
 export const EXTENSION_NAME = 'vscode-weave-context';
 
 /** Display name. */
-export const EXTENSION_DISPLAY_NAME = 'WeaveContext';
+export const EXTENSION_DISPLAY_NAME = 'Weave Context';
 
 /** Marketplace publisher. */
 export const USER_PUBLISHER = 'imgildev';
@@ -34,8 +34,8 @@ export const EXTENSION_BUY_ME_A_COFFEE_URL: string =
 /** Default enable state. */
 export const DEFAULT_ENABLE_SETTING = true;
 
-/** Default notes root relative to the selected workspace folder. */
-export const DEFAULT_NOTES_ROOT_SETTING = '.context/notes';
+/** Default Knowledge Repository Root relative to the selected workspace folder. */
+export const DEFAULT_NOTES_ROOT_SETTING = '.context';
 
-/** Default notes explorer projection mode. */
+/** Default Knowledge Repository explorer projection mode. */
 export const DEFAULT_TREE_PROJECTION_SETTING = 'filesystem' as const;

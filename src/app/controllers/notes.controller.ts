@@ -250,13 +250,13 @@ export class NotesController {
     }
 
     const targetUri =
-      await this.notesService.resolveMarkdownWikiLink(trimmedOldTarget);
+      await this.notesService.resolveNoteReference(trimmedOldTarget);
     if (!targetUri) {
       return undefined;
     }
 
     const conflictingTarget =
-      await this.notesService.resolveMarkdownWikiLink(trimmedNewTarget);
+      await this.notesService.resolveNoteReference(trimmedNewTarget);
     if (
       conflictingTarget &&
       conflictingTarget.toString() !== targetUri.toString()
@@ -264,9 +264,9 @@ export class NotesController {
       return undefined;
     }
 
-    const aliases = await this.notesService.getWikiLinkAliases(targetUri);
+    const aliases = await this.notesService.getNoteAliases(targetUri);
     const canonicalStem = getWikiLinkCanonicalStem(targetUri.fsPath);
-    const semanticTargets = this.notesService.buildWikiLinkSemanticTargets(
+    const semanticTargets = this.notesService.buildSemanticReferenceTargets(
       canonicalStem,
       aliases,
     );
@@ -325,7 +325,7 @@ export class NotesController {
       return undefined;
     }
 
-    const targetUri = await this.notesService.resolveMarkdownWikiLink(
+    const targetUri = await this.notesService.resolveNoteReference(
       wikiLink.target,
     );
 
@@ -355,7 +355,7 @@ export class NotesController {
       return [];
     }
 
-    const targetUri = await this.notesService.resolveMarkdownWikiLink(
+    const targetUri = await this.notesService.resolveNoteReference(
       wikiLink.target,
     );
     if (!targetUri) {
@@ -363,7 +363,7 @@ export class NotesController {
     }
 
     const context: OperationContext = {};
-    const references = await this.notesService.findWikiLinkReferencesTo(
+    const references = await this.notesService.findReferencesTo(
       targetUri.fsPath,
       context,
     );
@@ -439,8 +439,8 @@ export class NotesController {
 
     clearCache();
 
-    const aliases = await this.notesService.getWikiLinkAliases(newUri);
-    const semanticTargets = this.notesService.buildWikiLinkSemanticTargets(
+    const aliases = await this.notesService.getNoteAliases(newUri);
+    const semanticTargets = this.notesService.buildSemanticReferenceTargets(
       oldStem,
       aliases,
     );
@@ -487,7 +487,7 @@ export class NotesController {
     const lines = markdown.split(/\r?\n/);
     const rewritten = lines.map((line) => {
       const hits = findWikiLinksInLine(line).filter((hit) =>
-        this.notesService.wikilinkTargetMatchesSemanticTargets(
+        this.notesService.referenceTargetMatchesSemanticTargets(
           hit.target,
           semanticTargets,
         ),
@@ -644,6 +644,9 @@ export class NotesController {
     const categoryLine = this.formatLabeledValue(note.category, (value) =>
       l10n.t('Category: {0}', value),
     );
+    const typeLine = this.formatLabeledValue(note.type, (value) =>
+      l10n.t('Type: {0}', value),
+    );
     const projectLine = this.formatLabeledValue(note.project, (value) =>
       l10n.t('Project: {0}', value),
     );
@@ -658,6 +661,7 @@ export class NotesController {
       aliasesLine,
       tagsLine,
       categoryLine,
+      typeLine,
       projectLine,
     ].filter((line): line is string => !!line);
 

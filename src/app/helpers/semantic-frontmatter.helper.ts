@@ -353,7 +353,7 @@ export const normalizeSemanticFrontmatter = (
     created: normalizeString(fields.created),
     updated: normalizeString(fields.updated),
     category: normalizeString(fields.category),
-    status: normalizeString(fields.status),
+    type: normalizeString(fields.type),
     project: normalizeString(fields.project),
     tags: normalizeList(fields.tags),
     aliases: normalizeList(fields.aliases),
@@ -431,7 +431,7 @@ export const serializeSemanticFrontmatter = (
 
   appendScalar('updated', frontmatter.updated);
 
-  appendScalar('status', frontmatter.status);
+  appendScalar('type', frontmatter.type);
 
   appendScalar('project', frontmatter.project);
 

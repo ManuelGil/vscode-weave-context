@@ -9,7 +9,7 @@ import { Uri } from 'vscode';
 export type SemanticGroupTreeNode = {
   type: 'semanticGroup';
   label: string;
-  projection: 'category' | 'tags' | 'project';
+  projection: 'category' | 'type' | 'tags' | 'project';
   key: string;
 };
 
@@ -25,7 +25,6 @@ export type FileTreeNode = {
   type: 'file';
   uri: Uri;
   title?: string;
-  status?: string;
 };
 
 /**

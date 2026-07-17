@@ -123,7 +123,7 @@ export class NotesService {
    *
    * The optional label never participates in resolution.
    */
-  async resolveMarkdownWikiLink(targetReference: string): Promise<Uri | null> {
+  async resolveNoteReference(targetReference: string): Promise<Uri | null> {
     const trimmed = targetReference.trim();
     const normalizedInput = normalizeWikiLinkReference(trimmed);
 
@@ -157,7 +157,7 @@ export class NotesService {
       }
 
       if (basenameHit) {
-        await this.getWikiLinkAliases(basenameHit.uri);
+        await this.getNoteAliases(basenameHit.uri);
         return basenameHit.uri;
       }
 
@@ -222,7 +222,7 @@ export class NotesService {
   /**
    * Returns the exact alias strings declared in the note frontmatter.
    */
-  async getWikiLinkAliases(noteUri: Uri): Promise<string[]> {
+  async getNoteAliases(noteUri: Uri): Promise<string[]> {
     try {
       const markdown = await readFileContent(noteUri);
       const parsed = parseSupportedSemanticFrontmatter(markdown).data;
@@ -233,7 +233,7 @@ export class NotesService {
   }
 
   /** Builds the exact and alias target strings used for reference matching. */
-  buildWikiLinkSemanticTargets(
+  buildSemanticReferenceTargets(
     canonicalStem: string,
     aliases: readonly string[],
   ): Set<string> {
@@ -245,22 +245,22 @@ export class NotesService {
   }
 
   /** Returns semantic targets for a note file path (stem + frontmatter aliases). */
-  async getWikiLinkSemanticTargetsForFile(
+  async getSemanticReferenceTargetsForFile(
     filePath: string,
   ): Promise<Set<string>> {
     const canonicalStem = getWikiLinkCanonicalStem(filePath);
-    const aliases = await this.getWikiLinkAliases(Uri.file(filePath));
+    const aliases = await this.getNoteAliases(Uri.file(filePath));
 
-    return this.buildWikiLinkSemanticTargets(canonicalStem, aliases);
+    return this.buildSemanticReferenceTargets(canonicalStem, aliases);
   }
 
   /**
    * Returns true when a wikilink target refers to one of the semantic targets.
    *
    * Matches both exact strings and normalized slug equality, aligning with
-   * {@link NotesService.resolveMarkdownWikiLink}.
+   * {@link NotesService.resolveNoteReference}.
    */
-  wikilinkTargetMatchesSemanticTargets(
+  referenceTargetMatchesSemanticTargets(
     targetReference: string,
     semanticTargets: ReadonlySet<string> | readonly string[],
   ): boolean {
@@ -300,7 +300,7 @@ export class NotesService {
    * Aligns reference, navigation-adjacent, and Context View flows on the same
    * content source: open documents use their current buffer; otherwise disk.
    */
-  async readMarkdownContentForWikiLinks(
+  async readMarkdownContentForReferences(
     filePath: string,
   ): Promise<string | null> {
     try {
@@ -315,15 +315,15 @@ export class NotesService {
   /**
    * Scans workspace notes for wikilinks that refer to the target note.
    */
-  async findWikiLinkReferencesTo(
+  async findReferencesTo(
     targetFilePath: string,
     context: OperationContext = {},
     readNoteContent: (filePath: string) => Promise<string | null> = (
       filePath,
-    ) => this.readMarkdownContentForWikiLinks(filePath),
+    ) => this.readMarkdownContentForReferences(filePath),
   ): Promise<WikiLinkReference[]> {
     const semanticTargets =
-      await this.getWikiLinkSemanticTargetsForFile(targetFilePath);
+      await this.getSemanticReferenceTargetsForFile(targetFilePath);
     const noteUris = await this.discoverNoteFileUrisThroughContext(context);
     const references: WikiLinkReference[] = [];
 
@@ -345,7 +345,7 @@ export class NotesService {
 
         for (const hit of hits) {
           if (
-            this.wikilinkTargetMatchesSemanticTargets(
+            this.referenceTargetMatchesSemanticTargets(
               hit.target,
               semanticTargets,
             )
@@ -392,7 +392,7 @@ export class NotesService {
         {
           title: note.title,
           category: note.category,
-          status: note.status,
+          type: note.type,
           project: note.project,
           tags: note.tags,
           aliases: note.aliases,
@@ -440,7 +440,7 @@ export class NotesService {
         {
           title: updatedNote.title,
           category: updatedNote.category,
-          status: updatedNote.status,
+          type: updatedNote.type,
           project: updatedNote.project,
           tags: updatedNote.tags,
           aliases: updatedNote.aliases,
@@ -519,9 +519,6 @@ export class NotesService {
           : {}),
         ...(frontmatter.aliases !== undefined
           ? { aliases: frontmatter.aliases }
-          : {}),
-        ...(frontmatter.status !== undefined
-          ? { status: frontmatter.status }
           : {}),
         ...(frontmatter.project !== undefined
           ? { project: frontmatter.project }
