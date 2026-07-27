@@ -14,12 +14,22 @@ body,
   /* Graph visual properties derived from VSCode theme */
   --graph-node-default-color: color-mix(
     in srgb,
-    var(--vscode-foreground) 82%,
+    var(--vscode-foreground) 42%,
     transparent
   );
   --graph-node-default-border: color-mix(
     in srgb,
-    var(--vscode-foreground) 55%,
+    var(--vscode-foreground) 24%,
+    transparent
+  );
+  --graph-node-neighbor-color: color-mix(
+    in srgb,
+    var(--vscode-foreground) 82%,
+    transparent
+  );
+  --graph-node-neighbor-border: color-mix(
+    in srgb,
+    var(--vscode-foreground) 52%,
     transparent
   );
   --graph-node-focus-color: var(--vscode-textLink-foreground);
@@ -30,13 +40,18 @@ body,
   --graph-node-highlight: var(--vscode-textLink-activeForeground);
   --graph-edge-color: color-mix(
     in srgb,
-    var(--vscode-foreground) 35%,
+    var(--vscode-foreground) 22%,
+    transparent
+  );
+  --graph-edge-focus: color-mix(
+    in srgb,
+    var(--vscode-textLink-foreground) 78%,
     transparent
   );
   --graph-edge-highlight: var(--vscode-textLink-activeForeground);
   --graph-edge-dimmed: color-mix(
     in srgb,
-    var(--vscode-foreground) 12%,
+    var(--vscode-foreground) 8%,
     transparent
   );
   --graph-label-color: var(--vscode-foreground);

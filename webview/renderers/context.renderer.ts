@@ -11,22 +11,27 @@ import type {
   RendererInteraction,
 } from '../types/context.types';
 
-const MAX_VISIBLE_LABEL_LENGTH = 28;
-const PROGRESSIVE_LABEL_THRESHOLD = 6;
-const UNIFIED_NODE_SIZE = 8;
-const FOCUS_NODE_SIZE = 13;
-const HIGHLIGHTED_NODE_SIZE = 12;
-const FOCUS_BORDER_SIZE = 2;
-const ACTIVE_EDGE_SIZE = 2.5;
-const DIMMED_EDGE_SIZE = 1;
-const DEFAULT_EDGE_SIZE = 1.5;
-const LABEL_OFFSET_Y = 4;
+const MAX_VISIBLE_LABEL_LENGTH = 18;
+const FOCUS_LABEL_LENGTH = 28;
+const SECONDARY_LABEL_LENGTH = 12;
+const SECONDARY_NODE_SIZE = 5;
+const NEIGHBOR_NODE_SIZE = 9;
+const FOCUS_NODE_SIZE = 16;
+const HIGHLIGHTED_NODE_SIZE = 11;
+const FOCUS_BORDER_SIZE = 2.6;
+const FOCUS_EDGE_SIZE = 2.4;
+const NEIGHBOR_EDGE_SIZE = 1.15;
+const SECONDARY_EDGE_SIZE = 0.75;
+const ACTIVE_EDGE_SIZE = 2.6;
+const DIMMED_EDGE_SIZE = 0.55;
+const LABEL_OFFSET_Y = 6;
 
+/** Visual weight by hop distance from the active note. */
 const DEPTH_OPACITY: Record<number, number> = {
   0: 1,
-  1: 0.9,
-  2: 0.7,
-  3: 0.5,
+  1: 0.92,
+  2: 0.38,
+  3: 0.24,
 };
 
 const depthOpacity = (depth: number): number => {
@@ -155,44 +160,28 @@ const truncateLabel = (
   return `${trimmed.slice(0, maxLength - 1)}…`;
 };
 
-const isFocusNeighbor = (
-  nodeId: string,
-  focusId: string,
-  edges: ContextEdge[],
-): boolean => {
-  return edges.some((edge) => {
-    if (!edge.targetFilePath) {
-      return false;
-    }
-
-    return (
-      (edge.sourceFilePath === focusId && edge.targetFilePath === nodeId) ||
-      (edge.targetFilePath === focusId && edge.sourceFilePath === nodeId)
-    );
-  });
-};
-
 const shouldShowNodeLabel = (
   nodeId: string,
-  nodes: RenderNode[],
-  edges: ContextEdge[],
+  depth: number,
   hoveredNodeId: string | null,
 ): boolean => {
-  if (nodes.length <= PROGRESSIVE_LABEL_THRESHOLD) {
-    return true;
-  }
-
-  const focusNode = nodes.find((node) => node.role === 'focus');
-
-  if (!focusNode) {
-    return true;
-  }
-
-  if (nodeId === focusNode.id || isFocusNeighbor(nodeId, focusNode.id, edges)) {
+  if (depth <= 1) {
     return true;
   }
 
   return hoveredNodeId === nodeId;
+};
+
+const labelLengthForDepth = (depth: number): number => {
+  if (depth === 0) {
+    return FOCUS_LABEL_LENGTH;
+  }
+
+  if (depth === 1) {
+    return MAX_VISIBLE_LABEL_LENGTH;
+  }
+
+  return SECONDARY_LABEL_LENGTH;
 };
 
 const drawNodeLabelBelow = (
@@ -203,6 +192,8 @@ const drawNodeLabelBelow = (
     size: number;
     label?: string | null;
     labelColor?: string;
+    labelSize?: number;
+    labelWeight?: string;
   },
   settings: {
     labelSize: number;
@@ -215,9 +206,9 @@ const drawNodeLabelBelow = (
     return;
   }
 
-  const fontSize = settings.labelSize;
+  const fontSize = data.labelSize ?? settings.labelSize;
   const font = settings.labelFont;
-  const weight = settings.labelWeight;
+  const weight = data.labelWeight ?? settings.labelWeight;
   const color =
     data.labelColor ??
     (settings.labelColor.attribute
@@ -319,29 +310,36 @@ export function createContextRenderer(): ContextRenderer {
     const isSelected = interaction.selectedNodeId === node;
     const isHovered = interaction.hoveredNodeId === node;
     const isHighlighted =
-      isSelected ||
-      isHovered ||
-      isNodeConnectedToSelection(node);
+      isSelected || isHovered || isNodeConnectedToSelection(node);
     const isFocus = role === 'focus';
+    const nodeDepth = nodeDepthMap.get(node) ?? 3;
     const rawLabel = renderNode?.label ?? '';
     const showLabel = shouldShowNodeLabel(
       node,
-      latestNodes,
-      latestEdges,
+      nodeDepth,
       interaction.hoveredNodeId,
     );
 
-    let size = UNIFIED_NODE_SIZE;
+    let size = SECONDARY_NODE_SIZE;
     if (isFocus) {
       size = FOCUS_NODE_SIZE;
+    } else if (nodeDepth <= 1) {
+      size = NEIGHBOR_NODE_SIZE;
     }
+
     if (isHighlighted && !isFocus) {
-      size = HIGHLIGHTED_NODE_SIZE;
+      size = Math.max(size, HIGHLIGHTED_NODE_SIZE);
     }
 
     let nodeColor = cssVar('--graph-node-default-color');
     let borderColor = cssVar('--graph-node-default-border');
-    let borderSize = 0.8;
+    let borderSize = 0.6;
+
+    if (nodeDepth <= 1 && !isFocus) {
+      nodeColor = cssVar('--graph-node-neighbor-color');
+      borderColor = cssVar('--graph-node-neighbor-border');
+      borderSize = 1;
+    }
 
     if (isFocus) {
       nodeColor = cssVar('--graph-node-focus-color');
@@ -359,7 +357,6 @@ export function createContextRenderer(): ContextRenderer {
       borderSize = FOCUS_BORDER_SIZE + 0.4;
     }
 
-    const nodeDepth = nodeDepthMap.get(node) ?? 3;
     const depthAlpha = depthOpacity(nodeDepth);
     const visualAlpha = isHighlighted ? Math.max(depthAlpha, 0.95) : depthAlpha;
 
@@ -367,13 +364,18 @@ export function createContextRenderer(): ContextRenderer {
     borderColor = withAlpha(borderColor, visualAlpha);
 
     let zIndex = 0;
-    if (isFocus && isSelected) {
-      zIndex = 3;
+    if (isFocus) {
+      zIndex = isSelected || isHovered ? 4 : 3;
     } else if (isHighlighted) {
       zIndex = 2;
-    } else if (isFocus) {
+    } else if (nodeDepth <= 1) {
       zIndex = 1;
     }
+
+    const labelColorVar =
+      isFocus || nodeDepth <= 1
+        ? '--graph-label-color'
+        : '--graph-label-muted';
 
     return {
       ...data,
@@ -382,9 +384,11 @@ export function createContextRenderer(): ContextRenderer {
       borderSize,
       size,
       label: showLabel
-        ? truncateLabel(rawLabel, MAX_VISIBLE_LABEL_LENGTH)
+        ? truncateLabel(rawLabel, labelLengthForDepth(nodeDepth))
         : '',
-      labelColor: withAlpha(cssVar('--graph-label-color'), visualAlpha),
+      labelColor: withAlpha(cssVar(labelColorVar), visualAlpha),
+      labelSize: isFocus ? 13 : nodeDepth <= 1 ? 11 : 10,
+      labelWeight: isFocus ? '700' : '600',
       zIndex,
     };
   };
@@ -399,30 +403,54 @@ export function createContextRenderer(): ContextRenderer {
     const highlighted = isEdgeHighlighted(source, target);
     const activeInteraction = hasActiveInteraction();
     const edgeAlpha = edgeDepthOpacity(source, target, nodeDepthMap);
+    const focusId = latestNodes.find((entry) => entry.role === 'focus')?.id;
+    const touchesFocus =
+      focusId !== undefined &&
+      (source === focusId || target === focusId);
+    const sourceDepth = nodeDepthMap.get(source) ?? 3;
+    const targetDepth = nodeDepthMap.get(target) ?? 3;
+    const minDepth = Math.min(sourceDepth, targetDepth);
 
     let edgeColor = withAlpha(cssVar('--graph-edge-color'), edgeAlpha);
-    let edgeSize = DEFAULT_EDGE_SIZE;
+    let edgeSize = SECONDARY_EDGE_SIZE;
     let edgeZIndex = 0;
+
+    if (touchesFocus) {
+      edgeColor = withAlpha(
+        cssVar('--graph-edge-focus'),
+        Math.max(edgeAlpha, 0.88),
+      );
+      edgeSize = FOCUS_EDGE_SIZE;
+      edgeZIndex = 2;
+    } else if (minDepth <= 1) {
+      edgeColor = withAlpha(
+        cssVar('--graph-edge-color'),
+        Math.min(edgeAlpha, 0.55),
+      );
+      edgeSize = NEIGHBOR_EDGE_SIZE;
+      edgeZIndex = 1;
+    } else {
+      edgeColor = withAlpha(
+        cssVar('--graph-edge-color'),
+        Math.min(edgeAlpha, 0.22),
+      );
+      edgeSize = SECONDARY_EDGE_SIZE;
+      edgeZIndex = 0;
+    }
 
     if (activeInteraction) {
       if (highlighted) {
         edgeColor = withAlpha(cssVar('--graph-edge-highlight'), 1);
         edgeSize = ACTIVE_EDGE_SIZE;
-        edgeZIndex = 1;
+        edgeZIndex = 2;
       } else {
         edgeColor = withAlpha(
           cssVar('--graph-edge-dimmed'),
-          Math.min(edgeAlpha, 0.35),
+          Math.min(edgeAlpha, 0.22),
         );
         edgeSize = DIMMED_EDGE_SIZE;
+        edgeZIndex = 0;
       }
-    } else if (highlighted) {
-      edgeColor = withAlpha(
-        cssVar('--graph-edge-highlight'),
-        Math.max(edgeAlpha, 0.95),
-      );
-      edgeSize = ACTIVE_EDGE_SIZE;
-      edgeZIndex = 1;
     }
 
     return {
@@ -471,6 +499,7 @@ export function createContextRenderer(): ContextRenderer {
 
     const nodeIds = new Set(latestNodes.map((node) => node.id));
     const defaultEdgeColor = cssVar('--graph-edge-color');
+    const focusId = latestNodes.find((entry) => entry.role === 'focus')?.id;
 
     for (const contextEdge of edges) {
       const source = contextEdge.sourceFilePath;
@@ -486,11 +515,15 @@ export function createContextRenderer(): ContextRenderer {
         continue;
       }
 
+      const touchesFocus =
+        focusId !== undefined &&
+        (source === focusId || target === focusId);
+
       graph.addEdgeWithKey(edgeId, source, target, {
-        size: 2,
+        size: touchesFocus ? FOCUS_EDGE_SIZE : NEIGHBOR_EDGE_SIZE,
         color: defaultEdgeColor,
-        type: 'arrow',
-        zIndex: 0,
+        type: touchesFocus ? 'arrow' : 'line',
+        zIndex: touchesFocus ? 1 : 0,
       });
     }
   };
@@ -504,16 +537,16 @@ export function createContextRenderer(): ContextRenderer {
     renderer = new Sigma(graph, container, {
       defaultEdgeType: 'arrow',
       renderEdgeLabels: false,
-      stagePadding: 28,
-      labelDensity: 1,
-      labelGridCellSize: 80,
+      stagePadding: 36,
+      labelDensity: 0.7,
+      labelGridCellSize: 100,
       labelRenderedSizeThreshold: 0,
       labelFont: 'var(--vscode-font-family)',
       labelSize: 11,
       labelWeight: '600',
       labelColor: { attribute: 'labelColor' },
       defaultDrawNodeLabel: drawNodeLabelBelow,
-      minEdgeThickness: 1,
+      minEdgeThickness: 0.8,
       minCameraRatio: 0.04,
       maxCameraRatio: 4,
     });

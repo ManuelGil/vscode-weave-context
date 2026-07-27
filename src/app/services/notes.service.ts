@@ -517,6 +517,7 @@ export class NotesService {
         ...(frontmatter.category !== undefined
           ? { category: frontmatter.category }
           : {}),
+        ...(frontmatter.type !== undefined ? { type: frontmatter.type } : {}),
         ...(frontmatter.aliases !== undefined
           ? { aliases: frontmatter.aliases }
           : {}),
