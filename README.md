@@ -6,7 +6,7 @@
 
 > Navigate repository knowledge like code.
 
-![Workspace Explorer, Wikilinks, Hover Navigation and Context View](https://raw.githubusercontent.com/ManuelGil/vscode-weave-context/main/assets/images/weave-context-overview.png)
+![Weave Context overview](https://raw.githubusercontent.com/ManuelGil/vscode-weave-context/main/assets/images/repository-overview.png)
 
 Weave Context is a native VS Code authoring experience for repository-based knowledge.
 
@@ -201,6 +201,8 @@ Context should be navigable like code.
 ```
 
 ## Navigation Workflows
+
+![Go to Definition and Hover Preview](https://raw.githubusercontent.com/ManuelGil/vscode-weave-context/main/assets/images/go-to-definition.png)
 
 Weave Context integrates directly into native VS Code workflows.
 
@@ -412,6 +414,8 @@ No inferred relationships are introduced.
 Visualization is a consumer of the navigation model, never its authority.
 
 ## Workspace Explorer
+
+![Workspace Explorer](https://raw.githubusercontent.com/ManuelGil/vscode-weave-context/main/assets/images/workspace-explorer.png)
 
 Weave Context includes a lightweight navigation-oriented explorer integrated into the VS Code sidebar.
 
